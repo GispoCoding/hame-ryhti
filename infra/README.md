@@ -42,7 +42,7 @@ Please verify that the reported changes are desired, and respond `yes` to apply 
 
 1. To create a new instance of hame-ryhti, copy [hame.tfvars.sample.json](hame.tfvars.sample.json) to a new file called `hame-your-deployment.tfvars.json`.
 2. Create an IAM user for CI/CD and take down the username and credentials. This can be used to configure CD deployment from Github. If CD is already configured, fill in existing user in `AWS_LAMBDA_USER` part in `hame-your-deployment.tfvars.json`. Fill credentials in Github secrets `AWS_LAMBDA_UPLOAD_ACCESS_KEY_ID` and `AWS_LAMBDA_UPLOAD_SECRET_ACCESS_KEY`.
-3. Change the values in `hame-your-deployment.tfvars.json` as required
+3. Change the values in `hame-your-deployment.tfvars.json` as required. If you need to save your instance variables to Github, you may encrypt the file with `sops -e hame-your-deployment.tfvars.json > hame-your-deployment.tfvars.enc.json`. The encrypted file may safely be added to a public Github repository.
 4. Create zip packages for the lambda functions by running `make build-lambda -C ..` (this
    has to be done only once since github actions can be configured to update functions).
 
