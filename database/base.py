@@ -120,10 +120,24 @@ class PlanBase(VersionedBase):
     __abstract__ = True
 
     name: Mapped[language_str]
+    initiated_at: Mapped[Optional[datetime]]
     exported_at: Mapped[Optional[datetime]]
+    prepared_at: Mapped[Optional[datetime]]
+    proposed_at: Mapped[Optional[datetime]]
+    proposition_modified_at: Mapped[Optional[datetime]]
+    approved_at: Mapped[Optional[datetime]]
+    correction_request_at: Mapped[Optional[datetime]]
+    appealed_at: Mapped[Optional[datetime]]
+    # correction_requested_and_appealed_at
+    partly_valid_from: Mapped[Optional[datetime]]
+    valid_before_plan_is_legalized: Mapped[Optional[datetime]]
+    legalized_at: Mapped[Optional[datetime]]
     valid_from: Mapped[Optional[datetime]]
     valid_to: Mapped[Optional[datetime]]
     repealed_at: Mapped[Optional[datetime]]
+    expired_at: Mapped[Optional[datetime]]
+    rejected_at: Mapped[Optional[datetime]]
+    suspended_at: Mapped[Optional[datetime]]
     lifecycle_status_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("codes.lifecycle_status.id", name="plan_lifecycle_status_id_fkey"),
         index=True,

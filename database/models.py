@@ -1,5 +1,4 @@
 import uuid
-from datetime import datetime
 from typing import Literal, Optional
 
 # we have to import CodeBase in codes.py from here to allow two-way relationships
@@ -31,7 +30,6 @@ class Plan(PlanBase):
     )
     organisation = relationship("Organisation", backref="plans")
 
-    approved_at: Mapped[Optional[datetime]]
     geom: Mapped[MultiPolygon]
 
 
