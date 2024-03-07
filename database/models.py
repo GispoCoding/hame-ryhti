@@ -220,3 +220,37 @@ class Document(VersionedBase):
     decision: Mapped[bool]
     decision_date: Mapped[Optional[timestamp]]
     # file
+
+
+class View(VersionedBase):
+    """
+    Virtuaalitaso/näkymä
+    """
+
+    __tablename___ = "view"
+
+    land_use_area_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("hame.land_use_area.id", name="land_use_area_id_fkey")
+    )
+
+    other_area_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("hame.other_area.id", name="other_area_id_fkey")
+    )
+
+    line_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("hame.line.id", name="line_id_fkey")
+    )
+
+    land_use_point_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("hame.land_use_point.id", name="land_use_point_id_fkey")
+    )
+
+    other_point_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("hame.other_point.id", name="other_point_id_fkey")
+    )
+    # plan_regulation_group_name = relationship()
+    description: Mapped[language_str]
+    ordering: Mapped[autoincrement_int]
+    short_name: Mapped[unique_str]
+    # color: Mapped[str]
+    # combined_text?
