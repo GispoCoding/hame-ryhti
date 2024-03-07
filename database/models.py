@@ -1,5 +1,4 @@
 import uuid
-from datetime import datetime
 from typing import Literal, Optional
 
 # we have to import CodeBase in codes.py from here to allow two-way relationships
@@ -30,7 +29,6 @@ class Plan(PlanBase):
         ForeignKey("hame.organisation.id", name="organisation_id_fkey")
     )
 
-    approved_at: Mapped[Optional[datetime]]
     geom: Mapped[MultiPolygon]
 
 
