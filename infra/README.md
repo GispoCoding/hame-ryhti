@@ -36,7 +36,7 @@ When you are sure that you want to change AWS infra, run
 terraform apply --var-file hame-dev.tfvars.json
 ```
 
-Please verify that the reported changes are desired, and respond `yes` to apply the changes to infrastructure.
+Please verify that the reported changes are desired, and respond `yes` to apply the changes to infrastructure. Please also commit the changes in terraform files to Github. If you want to save the changes to your variables to Github, encrypt the variables with `sops -e hame-dev.tfvars.json > hame-dev.tfvars.enc.json` and commit the encrypted file.
 
 ## Configuring new instances
 
