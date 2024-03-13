@@ -28,6 +28,16 @@ variable "SLACK_HOOK_URL" {
   type        = string
 }
 
+variable "bastion_ec2_host_private_key" {
+  description = "Bastion instance host key, may be rotated"
+  type        = string
+}
+
+variable "bastion_ec2_host_public_key" {
+  description = "Bastion instance public host key, may be rotated"
+  type        = string
+}
+
 variable "bastion_ec2_user_public_key" {
   description = "Public ssh key for bastion EC2 superuser"
   type        = string
