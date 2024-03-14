@@ -114,27 +114,31 @@ class PlanBase(VersionedBase):
     __abstract__ = True
 
     name: Mapped[language_str]
-    initiated_at: Mapped[Optional[datetime]]  # Kaavoitusaloite
-    exported_at: Mapped[Optional[datetime]]  # Vireilletullut
-    prepared_at: Mapped[Optional[datetime]]  # Valmistelu
-    proposed_at: Mapped[Optional[datetime]]  # Kaavaehdotus
-    proposition_modified_at: Mapped[Optional[datetime]]  # Muutettu kaavaehdotus
+    planning_initiative_at: Mapped[Optional[datetime]]  # Kaavoitusaloite
+    pending_at: Mapped[Optional[datetime]]  # Vireilletullut
+    preparation_at: Mapped[Optional[datetime]]  # Valmistelu
+    plan_proposal_at: Mapped[Optional[datetime]]  # Kaavaehdotus
+    amended_plan_proposal_at: Mapped[Optional[datetime]]  # Muutettu kaavaehdotus
     approved_at: Mapped[Optional[datetime]]  # Hyväksytty kaava
-    correction_requested_at: Mapped[Optional[datetime]]  # Oikaisukehotuksen alainen
-    appealed_at: Mapped[Optional[datetime]]  # Valituksen alainen
-    correction_requested_and_appealed_at: Mapped[
+    under_rectification_reminder_at: Mapped[
+        Optional[datetime]
+    ]  # Oikaisukehotuksen alainen
+    under_appeal_at: Mapped[Optional[datetime]]  # Valituksen alainen
+    under_rectification_reminder_and_under_appeal_at: Mapped[
         Optional[datetime]
     ]  # Oikaisukehotuksen alainen ja valituksen alainen
-    partly_valid_from: Mapped[Optional[datetime]]  # Osittain voimassa
-    partly_valid_until: Mapped[Optional[datetime]]
-    valid_before_plan_is_final: Mapped[
+    partially_valid_from: Mapped[Optional[datetime]]  # Osittain voimassa
+    partially_valid_until: Mapped[Optional[datetime]]
+    valid_before_legal_validity_of_plan_from: Mapped[
         Optional[datetime]
     ]  # Voimassa ennen kaavan lainvoimaisuutta
-    final_at: Mapped[Optional[datetime]]  # Lainvoimainen
+    valid_before_legal_validity_of_plan_until: Mapped[Optional[datetime]]
+    legally_valid_from: Mapped[Optional[datetime]]  # Lainvoimainen
+    legally_valid_until: Mapped[Optional[datetime]]
     valid_from: Mapped[Optional[datetime]]  # Voimassa
     valid_until: Mapped[Optional[datetime]]
     repealed_at: Mapped[Optional[datetime]]  # Kumoutunut
-    expired_at: Mapped[Optional[datetime]]  # Rauennut
+    lapsed_at: Mapped[Optional[datetime]]  # Rauennut
     rejected_at: Mapped[Optional[datetime]]  # Hylätty
     suspended_at: Mapped[Optional[datetime]]  # Keskeytetty
 
