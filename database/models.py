@@ -1,4 +1,5 @@
 import uuid
+from datetime import datetime
 from typing import Literal, Optional
 
 # we have to import CodeBase in codes.py from here to allow two-way relationships
@@ -8,7 +9,6 @@ from base import (  # noqa
     PlanObjectBase,
     VersionedBase,
     autoincrement_int,
-    datetime,
     language_str,
     numeric_range,
     timestamp,
