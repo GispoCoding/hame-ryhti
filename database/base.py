@@ -120,24 +120,30 @@ class PlanBase(VersionedBase):
     __abstract__ = True
 
     name: Mapped[language_str]
-    initiated_at: Mapped[Optional[datetime]]
-    exported_at: Mapped[Optional[datetime]]
-    prepared_at: Mapped[Optional[datetime]]
-    proposed_at: Mapped[Optional[datetime]]
-    proposition_modified_at: Mapped[Optional[datetime]]
-    approved_at: Mapped[Optional[datetime]]
-    correction_request_at: Mapped[Optional[datetime]]
-    appealed_at: Mapped[Optional[datetime]]
-    # correction_requested_and_appealed_at
-    partly_valid_from: Mapped[Optional[datetime]]
-    valid_before_plan_is_legalized: Mapped[Optional[datetime]]
-    legalized_at: Mapped[Optional[datetime]]
-    valid_from: Mapped[Optional[datetime]]
-    valid_to: Mapped[Optional[datetime]]
-    repealed_at: Mapped[Optional[datetime]]
-    expired_at: Mapped[Optional[datetime]]
-    rejected_at: Mapped[Optional[datetime]]
-    suspended_at: Mapped[Optional[datetime]]
+    initiated_at: Mapped[Optional[datetime]]  # Kaavoitusaloite
+    exported_at: Mapped[Optional[datetime]]  # Vireilletullut
+    prepared_at: Mapped[Optional[datetime]]  # Valmistelu
+    proposed_at: Mapped[Optional[datetime]]  # Kaavaehdotus
+    proposition_modified_at: Mapped[Optional[datetime]]  # Muutettu kaavaehdotus
+    approved_at: Mapped[Optional[datetime]]  # Hyväksytty kaava
+    correction_requested_at: Mapped[Optional[datetime]]  # Oikaisukehotuksen alainen
+    appealed_at: Mapped[Optional[datetime]]  # Valituksen alainen
+    correction_requested_and_appealed_at: Mapped[
+        Optional[datetime]
+    ]  # Oikaisukehotuksen alainen ja valituksen alainen
+    partly_valid_from: Mapped[Optional[datetime]]  # Osittain voimassa
+    partly_valid_until: Mapped[Optional[datetime]]
+    valid_before_plan_is_final: Mapped[
+        Optional[datetime]
+    ]  # Voimassa ennen kaavan lainvoimaisuutta
+    final_at: Mapped[Optional[datetime]]  # Lainvoimainen
+    valid_from: Mapped[Optional[datetime]]  # Voimassa
+    valid_until: Mapped[Optional[datetime]]
+    repealed_at: Mapped[Optional[datetime]]  # Kumoutunut
+    expired_at: Mapped[Optional[datetime]]  # Rauennut
+    rejected_at: Mapped[Optional[datetime]]  # Hylätty
+    suspended_at: Mapped[Optional[datetime]]  # Keskeytetty
+
     lifecycle_status_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("codes.lifecycle_status.id", name="plan_lifecycle_status_id_fkey"),
         index=True,
