@@ -114,33 +114,7 @@ class PlanBase(VersionedBase):
     __abstract__ = True
 
     name: Mapped[language_str]
-    planning_initiative_at: Mapped[Optional[datetime]]  # Kaavoitusaloite
-    pending_at: Mapped[Optional[datetime]]  # Vireilletullut
-    preparation_at: Mapped[Optional[datetime]]  # Valmistelu
-    plan_proposal_at: Mapped[Optional[datetime]]  # Kaavaehdotus
-    amended_plan_proposal_at: Mapped[Optional[datetime]]  # Muutettu kaavaehdotus
-    approved_at: Mapped[Optional[datetime]]  # Hyväksytty kaava
-    under_rectification_reminder_at: Mapped[
-        Optional[datetime]
-    ]  # Oikaisukehotuksen alainen
-    under_appeal_at: Mapped[Optional[datetime]]  # Valituksen alainen
-    under_rectification_reminder_and_under_appeal_at: Mapped[
-        Optional[datetime]
-    ]  # Oikaisukehotuksen alainen ja valituksen alainen
-    partially_valid_from: Mapped[Optional[datetime]]  # Osittain voimassa
-    partially_valid_until: Mapped[Optional[datetime]]
-    valid_before_legal_validity_of_plan_from: Mapped[
-        Optional[datetime]
-    ]  # Voimassa ennen kaavan lainvoimaisuutta
-    valid_before_legal_validity_of_plan_until: Mapped[Optional[datetime]]
-    legally_valid_from: Mapped[Optional[datetime]]  # Lainvoimainen
-    legally_valid_until: Mapped[Optional[datetime]]
-    valid_from: Mapped[Optional[datetime]]  # Voimassa
-    valid_until: Mapped[Optional[datetime]]
-    repealed_at: Mapped[Optional[datetime]]  # Kumoutunut
-    lapsed_at: Mapped[Optional[datetime]]  # Rauennut
-    rejected_at: Mapped[Optional[datetime]]  # Hylätty
-    suspended_at: Mapped[Optional[datetime]]  # Keskeytetty
+    exported_at: Mapped[Optional[datetime]]
 
     lifecycle_status_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("codes.lifecycle_status.id", name="plan_lifecycle_status_id_fkey"),
