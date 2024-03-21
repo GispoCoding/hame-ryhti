@@ -20,7 +20,7 @@ from geoalchemy2.shape import from_shape
 from shapely.geometry import MultiPolygon
 from sqlalchemy.orm import sessionmaker
 
-hame_count: int = 12  # adjust me when adding tables
+hame_count: int = 13  # adjust me when adding tables
 codes_count: int = 10  # adjust me when adding tables
 matview_count: int = 0  # adjust me when adding views
 
