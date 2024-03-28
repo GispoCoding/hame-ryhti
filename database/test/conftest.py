@@ -634,3 +634,10 @@ def document_instance(session, type_of_document_instance, plan_instance):
     )
     session.add(instance)
     return instance
+
+
+@pytest.fixture(scope="module")
+def lifecycle_date_instance(session, code_instance):
+    instance = models.LifeCycleDate(lifecycle_status=code_instance)
+    session.add(instance)
+    return instance

@@ -346,16 +346,23 @@ class LifeCycleDate(VersionedBase):
         ForeignKey("codes.lifecycle_status.id", name="plan_lifecycle_status_id_fkey"),
         index=True,
     )
-    plan_id: Mapped[uuid.UUID] = mapped_column(
+    plan_id: Mapped[Optional[uuid.UUID]] = mapped_column(
         ForeignKey("hame.plan.id", name="plan_id_fkey")
     )
-    plan_regulation_id: Mapped[uuid.UUID] = mapped_column(
+    plan_regulation_id: Mapped[Optional[uuid.UUID]] = mapped_column(
         ForeignKey("hame.plan_regulation.id", name="plan_regulation_id_fkey")
     )
-    plan_proposition_id: Mapped[uuid.UUID] = mapped_column(
+    plan_proposition_id: Mapped[Optional[uuid.UUID]] = mapped_column(
         ForeignKey("hame.plan_proposition.id", name="plan_proposition_id_fkey")
     )
 
+    plan: Mapped[Optional["Plan"]] = relationship(backref="lifecycle_dates")
+    plan_regulation: Mapped[Optional["PlanRegulation"]] = relationship(
+        backref="lifecycle_dates"
+    )
+    plan_proposition: Mapped[Optional["PlanProposition"]] = relationship(
+        backref="lifecycle_dates"
+    )
     lifecycle_status = relationship("LifeCycleStatus", backref="lifecycle_dates")
     starting_at: Mapped[Optional[datetime]]
     ending_at: Mapped[Optional[datetime]]

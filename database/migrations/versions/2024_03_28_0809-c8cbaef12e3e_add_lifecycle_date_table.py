@@ -1,21 +1,20 @@
 """add_lifecycle_date_table
 
-Revision ID: 9f39ca4ec470
-Revises: 0a8a2fecda2a
-Create Date: 2024-03-21 07:18:35.400587
+Revision ID: c8cbaef12e3e
+Revises: 749c61b91749
+Create Date: 2024-03-28 08:09:38.547453
 
 """
 from typing import Sequence, Union
 
+# import geoalchemy2
 import sqlalchemy as sa
 from alembic import op
-
-# import geoalchemy2
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision: str = "9f39ca4ec470"
-down_revision: Union[str, None] = "0a8a2fecda2a"
+revision: str = "c8cbaef12e3e"
+down_revision: Union[str, None] = "749c61b91749"
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
@@ -25,9 +24,9 @@ def upgrade() -> None:
     op.create_table(
         "lifecycle_date",
         sa.Column("lifecycle_status_id", sa.UUID(), nullable=False),
-        sa.Column("plan_id", sa.UUID(), nullable=False),
-        sa.Column("plan_regulation_id", sa.UUID(), nullable=False),
-        sa.Column("plan_proposition_id", sa.UUID(), nullable=False),
+        sa.Column("plan_id", sa.UUID(), nullable=True),
+        sa.Column("plan_regulation_id", sa.UUID(), nullable=True),
+        sa.Column("plan_proposition_id", sa.UUID(), nullable=True),
         sa.Column("starting_at", sa.DateTime(), nullable=True),
         sa.Column("ending_at", sa.DateTime(), nullable=True),
         sa.Column(
@@ -74,30 +73,30 @@ def upgrade() -> None:
         unique=False,
         schema="hame",
     )
-    op.drop_column("land_use_area", "valid_from", schema="hame")
     op.drop_column("land_use_area", "repealed_at", schema="hame")
+    op.drop_column("land_use_area", "valid_from", schema="hame")
     op.drop_column("land_use_area", "valid_to", schema="hame")
-    op.drop_column("land_use_point", "valid_from", schema="hame")
     op.drop_column("land_use_point", "repealed_at", schema="hame")
+    op.drop_column("land_use_point", "valid_from", schema="hame")
     op.drop_column("land_use_point", "valid_to", schema="hame")
-    op.drop_column("line", "valid_from", schema="hame")
     op.drop_column("line", "repealed_at", schema="hame")
+    op.drop_column("line", "valid_from", schema="hame")
     op.drop_column("line", "valid_to", schema="hame")
-    op.drop_column("other_area", "valid_from", schema="hame")
     op.drop_column("other_area", "repealed_at", schema="hame")
+    op.drop_column("other_area", "valid_from", schema="hame")
     op.drop_column("other_area", "valid_to", schema="hame")
-    op.drop_column("other_point", "valid_from", schema="hame")
     op.drop_column("other_point", "repealed_at", schema="hame")
+    op.drop_column("other_point", "valid_from", schema="hame")
     op.drop_column("other_point", "valid_to", schema="hame")
-    op.drop_column("plan", "valid_from", schema="hame")
     op.drop_column("plan", "repealed_at", schema="hame")
-    op.drop_column("plan", "valid_to", schema="hame")
     op.drop_column("plan", "approved_at", schema="hame")
-    op.drop_column("plan_proposition", "valid_from", schema="hame")
+    op.drop_column("plan", "valid_from", schema="hame")
+    op.drop_column("plan", "valid_to", schema="hame")
     op.drop_column("plan_proposition", "repealed_at", schema="hame")
+    op.drop_column("plan_proposition", "valid_from", schema="hame")
     op.drop_column("plan_proposition", "valid_to", schema="hame")
-    op.drop_column("plan_regulation", "valid_from", schema="hame")
     op.drop_column("plan_regulation", "repealed_at", schema="hame")
+    op.drop_column("plan_regulation", "valid_from", schema="hame")
     op.drop_column("plan_regulation", "valid_to", schema="hame")
     # ### end Alembic commands ###
 
@@ -117,7 +116,7 @@ def downgrade() -> None:
     op.add_column(
         "plan_regulation",
         sa.Column(
-            "repealed_at",
+            "valid_from",
             postgresql.TIMESTAMP(),
             autoincrement=False,
             nullable=True,
@@ -127,7 +126,7 @@ def downgrade() -> None:
     op.add_column(
         "plan_regulation",
         sa.Column(
-            "valid_from",
+            "repealed_at",
             postgresql.TIMESTAMP(),
             autoincrement=False,
             nullable=True,
@@ -147,7 +146,7 @@ def downgrade() -> None:
     op.add_column(
         "plan_proposition",
         sa.Column(
-            "repealed_at",
+            "valid_from",
             postgresql.TIMESTAMP(),
             autoincrement=False,
             nullable=True,
@@ -156,6 +155,26 @@ def downgrade() -> None:
     )
     op.add_column(
         "plan_proposition",
+        sa.Column(
+            "repealed_at",
+            postgresql.TIMESTAMP(),
+            autoincrement=False,
+            nullable=True,
+        ),
+        schema="hame",
+    )
+    op.add_column(
+        "plan",
+        sa.Column(
+            "valid_to",
+            postgresql.TIMESTAMP(),
+            autoincrement=False,
+            nullable=True,
+        ),
+        schema="hame",
+    )
+    op.add_column(
+        "plan",
         sa.Column(
             "valid_from",
             postgresql.TIMESTAMP(),
@@ -177,27 +196,7 @@ def downgrade() -> None:
     op.add_column(
         "plan",
         sa.Column(
-            "valid_to",
-            postgresql.TIMESTAMP(),
-            autoincrement=False,
-            nullable=True,
-        ),
-        schema="hame",
-    )
-    op.add_column(
-        "plan",
-        sa.Column(
             "repealed_at",
-            postgresql.TIMESTAMP(),
-            autoincrement=False,
-            nullable=True,
-        ),
-        schema="hame",
-    )
-    op.add_column(
-        "plan",
-        sa.Column(
-            "valid_from",
             postgresql.TIMESTAMP(),
             autoincrement=False,
             nullable=True,
@@ -217,7 +216,7 @@ def downgrade() -> None:
     op.add_column(
         "other_point",
         sa.Column(
-            "repealed_at",
+            "valid_from",
             postgresql.TIMESTAMP(),
             autoincrement=False,
             nullable=True,
@@ -227,7 +226,7 @@ def downgrade() -> None:
     op.add_column(
         "other_point",
         sa.Column(
-            "valid_from",
+            "repealed_at",
             postgresql.TIMESTAMP(),
             autoincrement=False,
             nullable=True,
@@ -247,7 +246,7 @@ def downgrade() -> None:
     op.add_column(
         "other_area",
         sa.Column(
-            "repealed_at",
+            "valid_from",
             postgresql.TIMESTAMP(),
             autoincrement=False,
             nullable=True,
@@ -257,7 +256,7 @@ def downgrade() -> None:
     op.add_column(
         "other_area",
         sa.Column(
-            "valid_from",
+            "repealed_at",
             postgresql.TIMESTAMP(),
             autoincrement=False,
             nullable=True,
@@ -277,7 +276,7 @@ def downgrade() -> None:
     op.add_column(
         "line",
         sa.Column(
-            "repealed_at",
+            "valid_from",
             postgresql.TIMESTAMP(),
             autoincrement=False,
             nullable=True,
@@ -287,7 +286,7 @@ def downgrade() -> None:
     op.add_column(
         "line",
         sa.Column(
-            "valid_from",
+            "repealed_at",
             postgresql.TIMESTAMP(),
             autoincrement=False,
             nullable=True,
@@ -307,7 +306,7 @@ def downgrade() -> None:
     op.add_column(
         "land_use_point",
         sa.Column(
-            "repealed_at",
+            "valid_from",
             postgresql.TIMESTAMP(),
             autoincrement=False,
             nullable=True,
@@ -317,7 +316,7 @@ def downgrade() -> None:
     op.add_column(
         "land_use_point",
         sa.Column(
-            "valid_from",
+            "repealed_at",
             postgresql.TIMESTAMP(),
             autoincrement=False,
             nullable=True,
@@ -337,7 +336,7 @@ def downgrade() -> None:
     op.add_column(
         "land_use_area",
         sa.Column(
-            "repealed_at",
+            "valid_from",
             postgresql.TIMESTAMP(),
             autoincrement=False,
             nullable=True,
@@ -347,7 +346,7 @@ def downgrade() -> None:
     op.add_column(
         "land_use_area",
         sa.Column(
-            "valid_from",
+            "repealed_at",
             postgresql.TIMESTAMP(),
             autoincrement=False,
             nullable=True,
