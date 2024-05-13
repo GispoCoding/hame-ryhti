@@ -34,6 +34,20 @@ plan_object_tables = [
 ]
 
 
+tables_with_polygon_geometry = [
+    "plan",
+    "land_use_area",
+    "other_area",
+]
+# tables_with_polygon_geometry = [
+#     klass.__tablename__
+#     for _, klass in inspect.getmembers(models, inspect.isclass)
+#     if inspect.getmodule(klass) == models
+#     and getattr(klass, "geom")
+
+# ]
+
+
 def generate_modified_at_triggers():
     trgfunc_signature = "trgfunc_modified_at()"
     trgfunc_definition = """
@@ -203,3 +217,67 @@ def generate_add_plan_id_fkey_triggers():
         trgs.append(trg)
 
     return trgs, [trgfunc]
+
+
+def generate_validate_polygon_geometry_triggers():
+    trgfunc_signature = "trgfunc_validate_polygon_geometry()"
+    trgfunc_definition = """
+    RETURNS TRIGGER AS $$
+    BEGIN
+        IF NOT ST_IsValid(NEW.geom) THEN
+            RAISE EXCEPTION 'Invalid geometry. Must not intercept itself etc.';
+        END IF;
+        RETURN NEW;
+    END;
+    $$ language 'plpgsql'
+    """
+    trgfunc = PGFunction(
+        schema="hame", signature=trgfunc_signature, definition=trgfunc_definition
+    )
+
+    trgs = []
+    for table in tables_with_polygon_geometry:
+        trg_signature = f"trg_{table}_validate_polygon_geometry"
+        trg_definition = f"""
+        BEFORE INSERT OR UPDATE ON {table}
+        FOR EACH ROW
+        EXECUTE FUNCTION hame.{trgfunc_signature}
+        """
+
+        trg = PGTrigger(
+            schema="hame",
+            signature=trg_signature,
+            on_entity=f"hame.{table}",
+            is_constraint=False,
+            definition=trg_definition,
+        )
+        trgs.append(trg)
+
+    return trgs, [trgfunc]
+
+
+trgfunc_validate_line_geometry = PGFunction(
+    schema="hame",
+    signature="trgfunc_line_validate_geometry()",
+    definition="""
+    RETURNS TRIGGER AS $$
+    BEGIN
+        IF NOT ST_IsSimple(NEW.geom) THEN
+            RAISE EXCEPTION 'Invalid geometry. Must not intercept itself.';
+        END IF;
+        RETURN NEW;
+    END;
+    $$ language 'plpgsql'
+    """,
+)
+
+trg_validate_line_geometry = PGTrigger(
+    schema="hame",
+    signature="trg_line_validate_geometry",
+    on_entity="hame.line",
+    is_constraint=False,
+    definition="""
+    BEFORE INSERT OR UPDATE ON line
+    FOR EACH ROW
+    EXECUTE FUNCTION hame.trgfunc_line_validate_geometry()""",
+)
