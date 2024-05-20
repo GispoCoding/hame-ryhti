@@ -225,7 +225,7 @@ def generate_validate_polygon_geometry_triggers():
     RETURNS TRIGGER AS $$
     BEGIN
         IF NOT ST_IsValid(NEW.geom) THEN
-            RAISE EXCEPTION 'Invalid geometry. Must not intercept itself etc.';
+            RAISE EXCEPTION 'Invalid geometry. Must follow OGC rules.';
         END IF;
         RETURN NEW;
     END;
@@ -263,7 +263,7 @@ trgfunc_validate_line_geometry = PGFunction(
     RETURNS TRIGGER AS $$
     BEGIN
         IF NOT ST_IsSimple(NEW.geom) THEN
-            RAISE EXCEPTION 'Invalid geometry. Must not intercept itself.';
+            RAISE EXCEPTION 'Invalid geometry. Must not intersect itself.';
         END IF;
         RETURN NEW;
     END;
@@ -280,4 +280,52 @@ trg_validate_line_geometry = PGTrigger(
     BEFORE INSERT OR UPDATE ON line
     FOR EACH ROW
     EXECUTE FUNCTION hame.trgfunc_line_validate_geometry()""",
+)
+
+
+trgfunc_add_intersecting_other_area_geometries = PGFunction(
+    schema="hame",
+    signature="trgfunc_other_area_insert_intersecting_geometries()",
+    definition="""
+    RETURNS TRIGGER AS $$
+    BEGIN
+        -- Check if the new entry has id of a plan_regulation_group
+        -- which has id of a plan_regulation that has intended_use_id
+        -- that equals to 'paakayttotarkoitus'
+        IF EXISTS (
+            SELECT 1
+            FROM hame.plan_regulation_group prg
+            JOIN hame.plan_regulation pr ON pr.plan_regulation_group_id = prg.id
+            JOIN codes.type_of_additional_information tai ON tai.id = pr.intended_use_id
+            WHERE tai.value = 'paakayttotarkoitus'
+            AND prg.id = NEW.plan_regulation_group_id
+        ) THEN
+            -- check if there already is an entry in other_area table with the same
+            -- plan_regulation_group that the new geometry intersects
+            IF EXISTS (
+                SELECT 1
+                FROM hame.other_area oa
+                WHERE oa.plan_regulation_group_id = NEW.plan_regulation_group_id
+                AND ST_Intersects(oa.geom, NEW.geom)
+            ) THEN
+                RAISE EXCEPTION 'New entry intersects with existing entry, both with
+                intended_use of paakayttotarkoitus';
+            END IF;
+        END IF;
+
+        RETURN NEW;
+    END;
+    $$ language 'plpgsql'
+    """,
+)
+
+trg_add_intersecting_other_area_geometries = PGTrigger(
+    schema="hame",
+    signature="trg_other_area_insert_intersecting_geometries",
+    on_entity="hame.other_area",
+    is_constraint=False,
+    definition="""
+    BEFORE INSERT ON other_area
+    FOR EACH ROW
+    EXECUTE FUNCTION hame.trgfunc_other_area_insert_intersecting_geometries()""",
 )
