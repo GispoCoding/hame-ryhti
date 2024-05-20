@@ -277,7 +277,7 @@ def test_add_plan_id_fkey_triggers(
     another_line_instance = models.Line(
         geom=from_shape(
             MultiLineString(
-                [[[0.25, 0.50], [0.75, 0.50]], [[0.30, 0.60], [0.85, 0.45]]]
+                [[[0.25, 0.50], [0.75, 0.50]], [[0.25, 0.60], [0.75, 0.60]]]
             )
         ),
         lifecycle_status=code_instance,
