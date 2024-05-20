@@ -17,7 +17,9 @@ from triggers import (
     generate_new_lifecycle_date_triggers,
     generate_update_lifecycle_status_triggers,
     generate_validate_polygon_geometry_triggers,
+    trg_add_intersecting_other_area_geometries,
     trg_validate_line_geometry,
+    trgfunc_add_intersecting_other_area_geometries,
     trgfunc_validate_line_geometry,
 )
 
@@ -51,6 +53,8 @@ imported_functions = (
     + validate_polygon_geometry_trgfuncs
     + [trg_validate_line_geometry]
     + [trgfunc_validate_line_geometry]
+    + [trg_add_intersecting_other_area_geometries]
+    + [trgfunc_add_intersecting_other_area_geometries]
 )
 
 register_entities(entities=imported_functions, entity_types=[PGTrigger, PGFunction])
