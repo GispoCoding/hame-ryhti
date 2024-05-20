@@ -353,6 +353,7 @@ def test_validate_polygon_geometry_triggers(
     session.add(invalid_other_area_instance)
     with pytest.raises(InternalError):
         session.commit()
+    session.rollback()
 
 
 def test_validate_line_geometry(
@@ -361,7 +362,6 @@ def test_validate_line_geometry(
     type_of_underground_instance: codes.TypeOfUnderground,
     plan_regulation_group_instance: models.PlanRegulationGroup,
 ):
-    session.rollback()
     # Create line_instance that intersects itself
     another_line_instance = models.Line(
         geom=from_shape(
@@ -376,6 +376,7 @@ def test_validate_line_geometry(
     with pytest.raises(InternalError):
         session.add(another_line_instance)
         session.commit()
+    session.rollback()
 
 
 def test_intersecting_other_area_geometries_trigger(
@@ -385,7 +386,6 @@ def test_intersecting_other_area_geometries_trigger(
     type_of_underground_instance: codes.TypeOfUnderground,
     plan_regulation_group_instance: models.PlanRegulationGroup,
 ):
-    session.rollback()
     another_type_of_additional_information_instance = codes.TypeOfAdditionalInformation(
         value="paakayttotarkoitus", status="LOCAL"
     )
@@ -408,3 +408,4 @@ def test_intersecting_other_area_geometries_trigger(
     with pytest.raises(InternalError):
         session.add(new_other_area_instance)
         session.commit()
+    session.rollback()
