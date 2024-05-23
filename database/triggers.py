@@ -1,8 +1,11 @@
 import inspect
+from typing import get_type_hints
 
 import models
 from alembic_utils.pg_function import PGFunction
 from alembic_utils.pg_trigger import PGTrigger
+from shapely.geometry import MultiPolygon
+from sqlalchemy.orm import Mapped
 
 # All hame tables
 hame_tables = [
@@ -33,19 +36,13 @@ plan_object_tables = [
     if inspect.getmodule(klass) == models and issubclass(klass, models.PlanObjectBase)
 ]
 
-
 tables_with_polygon_geometry = [
-    "plan",
-    "land_use_area",
-    "other_area",
+    klass.__tablename__
+    for _, klass in inspect.getmembers(models, inspect.isclass)
+    if inspect.getmodule(klass) == models
+    and "geom" in get_type_hints(klass)
+    and get_type_hints(klass)["geom"] == Mapped[MultiPolygon]
 ]
-# tables_with_polygon_geometry = [
-#     klass.__tablename__
-#     for _, klass in inspect.getmembers(models, inspect.isclass)
-#     if inspect.getmodule(klass) == models
-#     and getattr(klass, "geom")
-
-# ]
 
 
 def generate_modified_at_triggers():

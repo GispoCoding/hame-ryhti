@@ -1,8 +1,8 @@
 """add_geometry_validation_triggers
 
-Revision ID: 0c3bc8606d57
+Revision ID: 1d702fe0daf2
 Revises: 4f8bcdc437a8
-Create Date: 2024-05-20 10:16:40.733842
+Create Date: 2024-05-23 16:20:37.037611
 
 """
 from typing import Sequence, Union
@@ -15,7 +15,7 @@ from alembic_utils.pg_trigger import PGTrigger
 from sqlalchemy import text as sql_text
 
 # revision identifiers, used by Alembic.
-revision: str = "0c3bc8606d57"
+revision: str = "1d702fe0daf2"
 down_revision: Union[str, None] = "4f8bcdc437a8"
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -44,15 +44,6 @@ def upgrade() -> None:
     )
     op.create_entity(hame_trgfunc_other_area_insert_intersecting_geometries)
 
-    hame_plan_trg_plan_validate_polygon_geometry = PGTrigger(
-        schema="hame",
-        signature="trg_plan_validate_polygon_geometry",
-        on_entity="hame.plan",
-        is_constraint=False,
-        definition="BEFORE INSERT OR UPDATE ON plan\n        FOR EACH ROW\n        EXECUTE FUNCTION hame.trgfunc_validate_polygon_geometry()",
-    )
-    op.create_entity(hame_plan_trg_plan_validate_polygon_geometry)
-
     hame_land_use_area_trg_land_use_area_validate_polygon_geometry = PGTrigger(
         schema="hame",
         signature="trg_land_use_area_validate_polygon_geometry",
@@ -70,6 +61,15 @@ def upgrade() -> None:
         definition="BEFORE INSERT OR UPDATE ON other_area\n        FOR EACH ROW\n        EXECUTE FUNCTION hame.trgfunc_validate_polygon_geometry()",
     )
     op.create_entity(hame_other_area_trg_other_area_validate_polygon_geometry)
+
+    hame_plan_trg_plan_validate_polygon_geometry = PGTrigger(
+        schema="hame",
+        signature="trg_plan_validate_polygon_geometry",
+        on_entity="hame.plan",
+        is_constraint=False,
+        definition="BEFORE INSERT OR UPDATE ON plan\n        FOR EACH ROW\n        EXECUTE FUNCTION hame.trgfunc_validate_polygon_geometry()",
+    )
+    op.create_entity(hame_plan_trg_plan_validate_polygon_geometry)
 
     hame_line_trg_line_validate_geometry = PGTrigger(
         schema="hame",
@@ -112,6 +112,15 @@ def downgrade() -> None:
     )
     op.drop_entity(hame_line_trg_line_validate_geometry)
 
+    hame_plan_trg_plan_validate_polygon_geometry = PGTrigger(
+        schema="hame",
+        signature="trg_plan_validate_polygon_geometry",
+        on_entity="hame.plan",
+        is_constraint=False,
+        definition="BEFORE INSERT OR UPDATE ON plan\n        FOR EACH ROW\n        EXECUTE FUNCTION hame.trgfunc_validate_polygon_geometry()",
+    )
+    op.drop_entity(hame_plan_trg_plan_validate_polygon_geometry)
+
     hame_other_area_trg_other_area_validate_polygon_geometry = PGTrigger(
         schema="hame",
         signature="trg_other_area_validate_polygon_geometry",
@@ -129,15 +138,6 @@ def downgrade() -> None:
         definition="BEFORE INSERT OR UPDATE ON land_use_area\n        FOR EACH ROW\n        EXECUTE FUNCTION hame.trgfunc_validate_polygon_geometry()",
     )
     op.drop_entity(hame_land_use_area_trg_land_use_area_validate_polygon_geometry)
-
-    hame_plan_trg_plan_validate_polygon_geometry = PGTrigger(
-        schema="hame",
-        signature="trg_plan_validate_polygon_geometry",
-        on_entity="hame.plan",
-        is_constraint=False,
-        definition="BEFORE INSERT OR UPDATE ON plan\n        FOR EACH ROW\n        EXECUTE FUNCTION hame.trgfunc_validate_polygon_geometry()",
-    )
-    op.drop_entity(hame_plan_trg_plan_validate_polygon_geometry)
 
     hame_trgfunc_other_area_insert_intersecting_geometries = PGFunction(
         schema="hame",
