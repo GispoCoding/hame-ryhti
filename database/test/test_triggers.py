@@ -401,7 +401,7 @@ def test_validate_line_geometry(
 
 def test_intersecting_other_area_geometries_trigger(
     session: Session,
-    plan_regulation_instance: models.PlanRegulation,
+    text_plan_regulation_instance: models.PlanRegulation,
     code_instance: codes.LifeCycleStatus,
     type_of_underground_instance: codes.TypeOfUnderground,
     plan_regulation_group_instance: models.PlanRegulationGroup,
@@ -410,7 +410,7 @@ def test_intersecting_other_area_geometries_trigger(
         value="paakayttotarkoitus", status="LOCAL"
     )
     session.add(another_type_of_additional_information_instance)
-    plan_regulation_instance.intended_use = (
+    text_plan_regulation_instance.intended_use = (
         another_type_of_additional_information_instance
     )
     session.flush()
