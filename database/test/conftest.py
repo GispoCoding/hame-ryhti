@@ -24,7 +24,7 @@ from sqlalchemy.orm import Session, sessionmaker
 
 hame_count: int = 13  # adjust me when adding tables
 codes_count: int = 15  # adjust me when adding tables
-matview_count: int = 0  # adjust me when adding views
+view_count: int = 5  # adjust me when adding views
 
 USE_DOCKER = (
     "1"  # Use "" if you don't want pytest-docker to start and destroy the containers
@@ -272,7 +272,7 @@ def assert_database_is_alright(
     cur: psycopg2.extensions.cursor,
     expected_hame_count: int = hame_count,
     expected_codes_count: int = codes_count,
-    expected_matview_count: int = matview_count,
+    expected_view_count: int = view_count,
 ):
     """
     Checks that the database has the right amount of tables with the right
@@ -426,6 +426,13 @@ def assert_database_is_alright(
             None,
             f"CREATE UNIQUE INDEX ix_codes_{table_name}_value ON codes.{table_name} USING btree (value)",  # noqa
         ) in indexes
+
+    #   Check views
+    cur.execute(
+        "SELECT table_name FROM INFORMATION_SCHEMA.views WHERE table_schema='hame';"
+    )
+    views = cur.fetchall()
+    assert len(views) == expected_view_count
 
     # TODO: Check materialized views once we have any
     # cur.execute(
