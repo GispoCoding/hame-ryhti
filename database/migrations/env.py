@@ -4,6 +4,7 @@ from logging.config import fileConfig
 from alembic import context
 from alembic_utils.pg_function import PGFunction
 from alembic_utils.pg_trigger import PGTrigger
+from alembic_utils.pg_view import PGView
 from alembic_utils.replaceable_entity import register_entities
 from base import Base
 
@@ -22,6 +23,7 @@ from triggers import (
     trgfunc_add_intersecting_other_area_geometries,
     trgfunc_validate_line_geometry,
 )
+from views import generate_plan_object_views
 
 modified_at_trgs, modified_at_trgfuncs = generate_modified_at_triggers()
 (
@@ -40,6 +42,8 @@ add_plan_id_fkey_trgs, add_plan_id_fkey_trgfuncs = generate_add_plan_id_fkey_tri
     validate_polygon_geometry_trgfuncs,
 ) = generate_validate_polygon_geometry_triggers()
 
+plan_object_views = generate_plan_object_views()
+
 imported_functions = (
     modified_at_trgs
     + modified_at_trgfuncs
@@ -55,9 +59,12 @@ imported_functions = (
     + [trgfunc_validate_line_geometry]
     + [trg_add_intersecting_other_area_geometries]
     + [trgfunc_add_intersecting_other_area_geometries]
+    + plan_object_views
 )
 
-register_entities(entities=imported_functions, entity_types=[PGTrigger, PGFunction])
+register_entities(
+    entities=imported_functions, entity_types=[PGTrigger, PGFunction, PGView]
+)
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
