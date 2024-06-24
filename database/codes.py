@@ -1,4 +1,6 @@
+from geoalchemy2 import Geometry
 from models import CodeBase
+from sqlalchemy import Column
 
 
 class LifeCycleStatus(CodeBase):
@@ -127,6 +129,7 @@ class AdministrativeRegion(CodeBase):
 
     __tablename__ = "administrative_region"
     code_list_uri = "http://uri.suomi.fi/codelist/jhs/maakunta_1_20240101"
+    geom = Column(Geometry(geometry_type="MULTIPOLYGON", srid=3067), nullable=True)
 
 
 class TypeOfPlanRegulationGroup(CodeBase):
