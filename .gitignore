@@ -5,6 +5,9 @@
 .terraform*
 terraform.tfstate*
 
+# Files to test the validation api
+database/ryhti_debug/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -166,3 +169,6 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 >>>>>>> 8566ab6fdbbcc91121ae3a7edc02ddbaba2e920f
+
+# Visual Studio Code
+.vscode/

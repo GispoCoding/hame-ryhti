@@ -56,7 +56,7 @@ def test_database_cancel_all_migrations(
                 cur,
                 expected_hame_count=0,
                 expected_codes_count=0,
-                expected_matview_count=0,
+                expected_view_count=0,
             )
 
             cur.execute(
