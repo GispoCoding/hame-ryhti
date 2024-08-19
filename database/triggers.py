@@ -4,7 +4,7 @@ from typing import get_type_hints
 import models
 from alembic_utils.pg_function import PGFunction
 from alembic_utils.pg_trigger import PGTrigger
-from shapely.geometry import MultiPolygon
+from shapely.geometry import MultiPolygon, Polygon
 from sqlalchemy.orm import Mapped
 
 # All hame tables
@@ -41,7 +41,7 @@ tables_with_polygon_geometry = [
     for _, klass in inspect.getmembers(models, inspect.isclass)
     if inspect.getmodule(klass) == models
     and "geom" in get_type_hints(klass)
-    and get_type_hints(klass)["geom"] == Mapped[MultiPolygon]
+    and get_type_hints(klass)["geom"] in (Mapped[MultiPolygon], Mapped[Polygon])
 ]
 
 

@@ -4,7 +4,14 @@ import codes
 import models
 import pytest
 from geoalchemy2.shape import from_shape
-from shapely.geometry import MultiLineString, MultiPoint, MultiPolygon
+from shapely.geometry import (
+    LineString,
+    MultiLineString,
+    MultiPoint,
+    MultiPolygon,
+    Point,
+    Polygon,
+)
 from sqlalchemy.exc import InternalError
 from sqlalchemy.orm import Session
 
@@ -260,21 +267,17 @@ def test_add_plan_id_fkey_triggers(
     session.add(another_plan_instance)
 
     # Geometries inside either plan instance
-    polygon_1 = MultiPolygon(
+    polygon_1 = Polygon(
         [
-            (
-                (
-                    (382000.0, 6678000.0),
-                    (386000.0, 6678000.0),
-                    (386000.0, 6680000.0),
-                    (382000.0, 6680000.0),
-                ),
-            )
+            (382000.0, 6678000.0),
+            (386000.0, 6678000.0),
+            (386000.0, 6680000.0),
+            (382000.0, 6680000.0),
         ]
     )
-    point_1 = MultiPoint([[(383000.0, 6678500.0)], [384000.0, 6679500.0]])
-    polygon_2 = MultiPolygon([(((1.0, 2.0), (2.0, 2.0), (2.0, 1.0), (1.0, 1.0)),)])
-    point_2 = MultiPoint([[1.25, 1.25], [1.75, 1.75]])
+    point_1 = Point([383000.0, 6678500.0])
+    polygon_2 = Polygon([(1.0, 2.0), (2.0, 2.0), (2.0, 1.0), (1.0, 1.0)])
+    point_2 = Point([1.25, 1.25])
 
     # Add new plan object instances to fire the triggers
     another_land_use_area_instance = models.LandUseArea(
@@ -295,10 +298,10 @@ def test_add_plan_id_fkey_triggers(
 
     another_line_instance = models.Line(
         geom=from_shape(
-            MultiLineString(
+            LineString(
                 [
-                    [[383000.0, 6678500.0], [384000.0, 6679500.0]],
-                    [[385000.0, 6678500.0], [385000.0, 6679500.0]],
+                    [383000.0, 6678500.0],
+                    [384000.0, 6679500.0],
                 ]
             )
         ),
@@ -339,12 +342,13 @@ def test_validate_polygon_geometry_triggers(
     plan_regulation_group_instance: models.PlanRegulationGroup,
     organisation_instance: models.Organisation,
 ):
-    invalid_polygon = MultiPolygon(
-        [(((0.0, 0.0), (1.0, 1.0), (0.0, 1.0), (1.0, 0.0)),)]
+    invalid_polygon = Polygon([(0.0, 0.0), (1.0, 1.0), (0.0, 1.0), (1.0, 0.0)])
+    invalid_multipolygon = MultiPolygon(
+        ([(((0.0, 0.0), (1.0, 1.0), (0.0, 1.0), (1.0, 0.0)),)])
     )
 
     invalid_plan_instance = models.Plan(
-        geom=from_shape(invalid_polygon),
+        geom=from_shape(invalid_multipolygon),
         lifecycle_status=code_instance,
         organisation=organisation_instance,
     )
@@ -384,11 +388,7 @@ def test_validate_line_geometry(
 ):
     # Create line_instance that intersects itself
     another_line_instance = models.Line(
-        geom=from_shape(
-            MultiLineString(
-                [[[0.25, 0.25], [0.75, 0.75]], [[0.25, 0.75], [0.75, 0.25]]]
-            )
-        ),
+        geom=from_shape(LineString([[0, 0], [1, 1], [0, 1], [1, 0]])),
         lifecycle_status=code_instance,
         type_of_underground=type_of_underground_instance,
         plan_regulation_group=plan_regulation_group_instance,
@@ -417,9 +417,7 @@ def test_intersecting_other_area_geometries_trigger(
 
     # Create a new other_area_instance that intersects another_area_instance created in the previous test
     new_other_area_instance = models.OtherArea(
-        geom=from_shape(
-            MultiPolygon([(((1.0, 2.0), (2.0, 2.0), (2.0, 1.0), (1.0, 1.0)),)])
-        ),
+        geom=from_shape(Polygon([(1.0, 2.0), (2.0, 2.0), (2.0, 1.0), (1.0, 1.0)])),
         lifecycle_status=code_instance,
         type_of_underground=type_of_underground_instance,
         plan_regulation_group=plan_regulation_group_instance,

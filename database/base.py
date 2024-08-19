@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import Dict, List, Optional
 
 from geoalchemy2 import Geometry
-from shapely.geometry import MultiLineString, MultiPoint, MultiPolygon
+from shapely.geometry import LineString, MultiPolygon, Point, Polygon
 from sqlalchemy import ForeignKey
 from sqlalchemy.dialects.postgresql import JSONB, NUMRANGE, UUID, Range
 from sqlalchemy.orm import (
@@ -27,9 +27,10 @@ class Base(DeclarativeBase):
     type_annotation_map = {
         uuid.UUID: UUID(as_uuid=False),
         dict[str, str]: JSONB,
-        MultiLineString: Geometry(geometry_type="MULTILINESTRING", srid=PROJECT_SRID),
-        MultiPoint: Geometry(geometry_type="MULTIPOINT", srid=PROJECT_SRID),
         MultiPolygon: Geometry(geometry_type="MULTIPOLYGON", srid=PROJECT_SRID),
+        LineString: Geometry(geometry_type="LINESTRING", srid=PROJECT_SRID),
+        Polygon: Geometry(geometry_type="POLYGON", srid=PROJECT_SRID),
+        Point: Geometry(geometry_type="POINT", srid=PROJECT_SRID),
         Range[float]: NUMRANGE,
     }
 
