@@ -18,7 +18,7 @@ from db_helper import DatabaseHelper
 from db_manager import db_manager
 from dotenv import load_dotenv
 from geoalchemy2.shape import from_shape
-from shapely.geometry import MultiLineString, MultiPoint, MultiPolygon, shape
+from shapely.geometry import LineString, Point, Polygon, shape
 from sqlalchemy.dialects.postgresql import Range
 from sqlalchemy.orm import Session, sessionmaker
 
@@ -614,16 +614,14 @@ def land_use_area_instance(
         geom=from_shape(
             shape(
                 {
-                    "type": "MultiPolygon",
+                    "type": "Polygon",
                     "coordinates": [
                         [
-                            [
-                                [381849.834412134019658, 6677967.973336197435856],
-                                [381849.834412134019658, 6680613.389312859624624],
-                                [386378.427863708813675, 6680613.389312859624624],
-                                [386378.427863708813675, 6677967.973336197435856],
-                                [381849.834412134019658, 6677967.973336197435856],
-                            ]
+                            [381849.834412134019658, 6677967.973336197435856],
+                            [381849.834412134019658, 6680613.389312859624624],
+                            [386378.427863708813675, 6680613.389312859624624],
+                            [386378.427863708813675, 6677967.973336197435856],
+                            [381849.834412134019658, 6677967.973336197435856],
                         ]
                     ],
                 }
@@ -653,9 +651,7 @@ def other_area_instance(
     plan_regulation_group_instance,
 ):
     instance = models.OtherArea(
-        geom=from_shape(
-            MultiPolygon([(((0.0, 1.0), (1.0, 1.0), (1.0, 0.0), (0.0, 0.0)),)])
-        ),
+        geom=from_shape(Polygon([(0.0, 1.0), (1.0, 1.0), (1.0, 0.0), (0.0, 0.0)])),
         lifecycle_status=code_instance,
         type_of_underground=type_of_underground_instance,
         plan=plan_instance,
@@ -674,7 +670,7 @@ def line_instance(
     plan_regulation_group_instance,
 ):
     instance = models.Line(
-        geom=from_shape(MultiLineString([[[0, 0], [1, 2]], [[4, 4], [5, 6]]])),
+        geom=from_shape(LineString([[0, 0], [1, 2]])),
         lifecycle_status=code_instance,
         type_of_underground=type_of_underground_instance,
         plan=plan_instance,
@@ -693,7 +689,7 @@ def land_use_point_instance(
     plan_regulation_group_instance,
 ):
     instance = models.LandUsePoint(
-        geom=from_shape(MultiPoint([[0.0, 0.0], [1.0, 2.0]])),
+        geom=from_shape(Point([0.0, 0.0])),
         lifecycle_status=code_instance,
         type_of_underground=type_of_underground_instance,
         plan=plan_instance,
@@ -712,7 +708,7 @@ def other_point_instance(
     plan_regulation_group_instance,
 ):
     instance = models.OtherPoint(
-        geom=from_shape(MultiPoint([[0.0, 0.0], [1.0, 2.0]])),
+        geom=from_shape(Point([0.0, 0.0])),
         lifecycle_status=code_instance,
         type_of_underground=type_of_underground_instance,
         plan=plan_instance,

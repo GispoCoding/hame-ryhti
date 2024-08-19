@@ -13,7 +13,7 @@ from base import (  # noqa
     timestamp,
     unique_str,
 )
-from shapely.geometry import MultiLineString, MultiPoint, MultiPolygon
+from shapely.geometry import LineString, MultiPolygon, Point, Polygon
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -67,7 +67,7 @@ class LandUseArea(PlanObjectBase):
 
     __tablename__ = "land_use_area"
 
-    geom: Mapped[MultiPolygon]
+    geom: Mapped[Polygon]
 
 
 class OtherArea(PlanObjectBase):
@@ -77,7 +77,7 @@ class OtherArea(PlanObjectBase):
 
     __tablename__ = "other_area"
 
-    geom: Mapped[MultiPolygon]
+    geom: Mapped[Polygon]
 
 
 class Line(PlanObjectBase):
@@ -87,7 +87,7 @@ class Line(PlanObjectBase):
 
     __tablename__ = "line"
 
-    geom: Mapped[MultiLineString]
+    geom: Mapped[LineString]
 
 
 class LandUsePoint(PlanObjectBase):
@@ -97,7 +97,7 @@ class LandUsePoint(PlanObjectBase):
 
     __tablename__ = "land_use_point"
 
-    geom: Mapped[MultiPoint]
+    geom: Mapped[Point]
 
 
 class OtherPoint(PlanObjectBase):
@@ -107,7 +107,7 @@ class OtherPoint(PlanObjectBase):
 
     __tablename__ = "other_point"
 
-    geom: Mapped[MultiPoint]
+    geom: Mapped[Point]
 
 
 class PlanRegulationGroup(VersionedBase):
