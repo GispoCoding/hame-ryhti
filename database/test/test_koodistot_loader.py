@@ -624,7 +624,7 @@ def test_save_changed_objects(
     changed_koodistot_data, connection_string, main_db_params
 ):
     # The database is already populated in the first test. Because
-    # connection string (and therefore hame_database_created)
+    # connection string (and therefore arho_database_created)
     # has module scope, the database persists between tests.
     assert_data_is_imported(main_db_params)
     # check that a new loader adds one object to the database

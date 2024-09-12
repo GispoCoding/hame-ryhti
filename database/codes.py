@@ -37,7 +37,7 @@ class TypeOfAdditionalInformation(CodeBase):
     """
     Kaavamääräyksen lisätiedon laji
 
-    HAME-Ryhti-tietomallissa tämän koodiston arvot jaetaan useaan monivalintakenttään,
+    ARHO-Ryhti-tietomallissa tämän koodiston arvot jaetaan useaan monivalintakenttään,
     joista jokaisesta käyttäjä voi valita yhden koodin.
 
     Toteutetaan kentät niin, että jokaisessa on filtteri, joka tarkistaa sopivan

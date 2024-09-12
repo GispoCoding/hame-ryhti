@@ -1,9 +1,9 @@
 test-create-db:
-	@echo "Creating Hame database..."
+	@echo "Creating Arho database..."
 	curl -XPOST "http://localhost:8081/2015-03-31/functions/function/invocations" -d '{"event_type" : 1}'
 
 test-migrate-db:
-	@echo "Migrating Hame database..."
+	@echo "Migrating Arho database..."
 	curl -XPOST "http://localhost:8081/2015-03-31/functions/function/invocations" -d '{"event_type" : 3}'
 
 test-koodistot:

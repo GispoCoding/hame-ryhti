@@ -78,7 +78,7 @@ class Period(TypedDict):
 
 
 class RyhtiClient:
-    HEADERS = {"User-Agent": "HAME - Ryhti compatible Maakuntakaava database"}
+    HEADERS = {"User-Agent": "ARHO - Ryhti compatible Maakuntakaava database"}
     public_api_base = "https://api.ymparisto.fi/ryhti/plan-public/api/"
     xroad_api_path = "/r1/FI/GOV/0996189-5/Ryhti-Syke-Service/api/"
     xroad_server_address = ""
