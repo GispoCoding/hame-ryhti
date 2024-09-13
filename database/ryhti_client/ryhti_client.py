@@ -15,6 +15,7 @@ from codes import (
     NameOfPlanCaseDecision,
     TypeOfDecisionMaker,
     TypeOfInteractionEvent,
+    TypeOfPlanRegulation,
     TypeOfProcessingEvent,
     decisionmaker_by_status,
     decisions_by_status,
@@ -308,7 +309,7 @@ class RyhtiClient:
                 plan_regulation.type_of_verbal_plan_regulation.uri
             ]
         regulation_dict["additionalInformations"] = []
-        for code_value in [
+        for additional_information in [
             plan_regulation.intended_use,
             plan_regulation.existence,
             plan_regulation.regulation_type_additional_information,
@@ -318,10 +319,31 @@ class RyhtiClient:
             plan_regulation.disturbance_prevention,
             plan_regulation.construction_control,
         ]:
-            if code_value:
+            if additional_information:
                 regulation_dict["additionalInformations"].append(
-                    {"type": code_value.uri}
+                    {"type": additional_information.uri}
                 )
+        # Treat intended use allocation separately, it requires extra code values:
+        if plan_regulation.intended_use_allocation_or_exclusion:
+            for intended_use_value in (
+                plan_regulation.first_intended_use_allocation,
+                plan_regulation.second_intended_use_allocation,
+            ):
+                # if intended_use_value is missing, we cannot just add empty
+                # additional information
+                if intended_use_value:
+                    additional_information = {
+                        "type": plan_regulation.intended_use_allocation_or_exclusion.uri
+                    }
+                    additional_information["value"] = dict()
+                    additional_information["value"]["dataType"] = "code"
+                    additional_information["value"]["code"] = intended_use_value.uri
+                    additional_information["value"][
+                        "codeList"
+                    ] = TypeOfPlanRegulation.code_list_uri
+                    regulation_dict["additionalInformations"].append(
+                        additional_information
+                    )
         if plan_regulation.numeric_value:
             regulation_dict["value"] = {
                 "dataType": "decimal",
@@ -329,7 +351,11 @@ class RyhtiClient:
                 "number": plan_regulation.numeric_value,
                 "unitOfMeasure": plan_regulation.unit,
             }
-        elif plan_regulation.text_value:
+        elif (
+            plan_regulation.text_value.get("fin")
+            or plan_regulation.text_value.get("swe")
+            or plan_regulation.text_value.get("eng")
+        ):
             regulation_dict["value"] = {
                 "dataType": "LocalizedText",
                 "text": plan_regulation.text_value,

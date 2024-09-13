@@ -19,6 +19,7 @@ def desired_plan_dict(
     point_plan_regulation_group_instance: models.PlanRegulationGroup,
     general_regulation_group_instance: models.PlanRegulationGroup,
     text_plan_regulation_instance: models.PlanRegulation,
+    intended_use_plan_regulation_instance: models.PlanRegulation,
     point_text_plan_regulation_instance: models.PlanRegulation,
     numeric_plan_regulation_instance: models.PlanRegulation,
     verbal_plan_regulation_instance: models.PlanRegulation,
@@ -269,6 +270,35 @@ def desired_plan_dict(
                         # oh great, integer has to be string here for reasons unknown.
                         "regulationNumber": str(
                             verbal_plan_regulation_instance.ordering
+                        ),
+                        # TODO: plan regulation documents to be added.
+                        "periodOfValidity": None,
+                    },
+                    {
+                        "planRegulationKey": intended_use_plan_regulation_instance.id,
+                        "lifeCycleStatus": "http://uri.suomi.fi/codelist/rytj/kaavaelinkaari/code/03",
+                        "type": "http://uri.suomi.fi/codelist/rytj/RY_Kaavamaarayslaji/code/test",
+                        "subjectIdentifiers": [
+                            intended_use_plan_regulation_instance.name[
+                                "fin"
+                            ]  # TODO: onko asiasana aina yksikielinen??
+                        ],
+                        "additionalInformations": [
+                            {
+                                "type": "http://uri.suomi.fi/codelist/rytj/RY_Kaavamaarayksen_Lisatiedonlaji/code/test",
+                                "value": {
+                                    "dataType": "code",
+                                    "code": "http://uri.suomi.fi/codelist/rytj/RY_Kaavamaarayslaji/code/test",
+                                    "codeList": "http://uri.suomi.fi/codelist/rytj/RY_Kaavamaarayslaji",
+                                },
+                            }
+                        ],
+                        "planThemes": [
+                            "http://uri.suomi.fi/codelist/rytj/kaavoitusteema/code/test",
+                        ],
+                        # oh great, integer has to be string here for reasons unknown.
+                        "regulationNumber": str(
+                            intended_use_plan_regulation_instance.ordering
                         ),
                         # TODO: plan regulation documents to be added.
                         "periodOfValidity": None,

@@ -406,7 +406,7 @@ def koodistot_data(mock_koodistot, loader):
     # data should also contain the local codes
     assert len(data[codes.TypeOfPlanRegulationGroup]) == 5
     # for mixed local and remote codes, the data should contain both
-    assert len(data[codes.TypeOfAdditionalInformation]) == 5
+    assert len(data[codes.TypeOfAdditionalInformation]) == 6
     return data
 
 
@@ -422,7 +422,7 @@ def changed_koodistot_data(changed_mock_koodistot, loader):
     # data should also contain the local codes
     assert len(data[codes.TypeOfPlanRegulationGroup]) == 5
     # for mixed local and remote codes, the data should contain both
-    assert len(data[codes.TypeOfAdditionalInformation]) == 5
+    assert len(data[codes.TypeOfAdditionalInformation]) == 6
     return data
 
 
@@ -590,7 +590,7 @@ def assert_data_is_imported(main_db_params):
             cur.execute(f"SELECT count(*) FROM codes.type_of_plan_regulation_group")
             assert cur.fetchone()[0] == 5
             cur.execute(f"SELECT count(*) FROM codes.type_of_additional_information")
-            assert cur.fetchone()[0] == 5
+            assert cur.fetchone()[0] == 6
             check_code_parents(cur)
     finally:
         conn.close()
@@ -609,7 +609,7 @@ def assert_changed_data_is_imported(main_db_params):
             cur.execute(f"SELECT count(*) FROM codes.type_of_plan_regulation_group")
             assert cur.fetchone()[0] == 5
             cur.execute(f"SELECT count(*) FROM codes.type_of_additional_information")
-            assert cur.fetchone()[0] == 5
+            assert cur.fetchone()[0] == 6
             check_code_parents(cur)
     finally:
         conn.close()
