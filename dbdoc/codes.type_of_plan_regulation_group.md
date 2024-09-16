@@ -13,7 +13,7 @@
 | status | varchar |  | false |  |  |  |
 | level | integer | 1 | false |  |  |  |
 | parent_id | uuid |  | true |  | [codes.type_of_plan_regulation_group](codes.type_of_plan_regulation_group.md) |  |
-| id | uuid | gen_random_uuid() | false | [hame.plan_regulation_group](hame.plan_regulation_group.md) [codes.type_of_plan_regulation_group](codes.type_of_plan_regulation_group.md) |  |  |
+| id | uuid | gen_random_uuid() | false | [codes.type_of_plan_regulation_group](codes.type_of_plan_regulation_group.md) [arho.plan_regulation_group](arho.plan_regulation_group.md) |  |  |
 | created_at | timestamp without time zone | now() | false |  |  |  |
 | modified_at | timestamp without time zone | now() | false |  |  |  |
 

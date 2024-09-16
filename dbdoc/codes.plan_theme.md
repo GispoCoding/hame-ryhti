@@ -13,7 +13,7 @@
 | status | varchar |  | false |  |  |  |
 | level | integer | 1 | false |  |  |  |
 | parent_id | uuid |  | true |  | [codes.plan_theme](codes.plan_theme.md) |  |
-| id | uuid | gen_random_uuid() | false | [hame.plan_regulation](hame.plan_regulation.md) [hame.plan_proposition](hame.plan_proposition.md) [codes.plan_theme](codes.plan_theme.md) |  |  |
+| id | uuid | gen_random_uuid() | false | [codes.plan_theme](codes.plan_theme.md) [arho.plan_proposition](arho.plan_proposition.md) [arho.plan_regulation](arho.plan_regulation.md) |  |  |
 | created_at | timestamp without time zone | now() | false |  |  |  |
 | modified_at | timestamp without time zone | now() | false |  |  |  |
 

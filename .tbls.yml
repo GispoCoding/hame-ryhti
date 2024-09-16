@@ -1,5 +1,5 @@
 include:
-  - hame.*
+  - arho.*
   - codes.*
 
 viewpoints:
@@ -7,19 +7,19 @@ viewpoints:
     name: All tables
     desc: All tables that make up maakuntakaava plan data.
     tables:
-      - hame.plan
-      - hame.land_use_area
-      - hame.other_area
-      - hame.line
-      - hame.land_use_point
-      - hame.other_point
-      - hame.plan_regulation_group
-      - hame.plan_regulation
-      - hame.plan_proposition
-      - hame.document
-      - hame.source_data
-      - hame.organisation
-      - hame.lifecycle_date
+      - arho.plan
+      - arho.land_use_area
+      - arho.other_area
+      - arho.line
+      - arho.land_use_point
+      - arho.other_point
+      - arho.plan_regulation_group
+      - arho.plan_regulation
+      - arho.plan_proposition
+      - arho.document
+      - arho.source_data
+      - arho.organisation
+      - arho.lifecycle_date
       - codes.administrative_region
       - codes.lifecycle_status
       - codes.plan_theme
@@ -36,27 +36,27 @@ viewpoints:
         name: Plan geometry tables
         desc: These tables represent all geometries in the plan.
         tables:
-          - hame.plan
-          - hame.land_use_area
-          - hame.other_area
-          - hame.line
-          - hame.land_use_point
-          - hame.other_point
+          - arho.plan
+          - arho.land_use_area
+          - arho.other_area
+          - arho.line
+          - arho.land_use_point
+          - arho.other_point
       -
         name: Plan regulation tables
         desc: These tables represent all regulations in the plan.
         tables:
-          - hame.plan_regulation_group
-          - hame.plan_regulation
-          - hame.plan_proposition
+          - arho.plan_regulation_group
+          - arho.plan_regulation
+          - arho.plan_proposition
       -
         name: Plan metadata tables
         desc: These tables contain all metadata, documents and other linked information.
         tables:
-          - hame.document
-          - hame.source_data
-          - hame.organisation
-          - hame.lifecycle_date
+          - arho.document
+          - arho.source_data
+          - arho.organisation
+          - arho.lifecycle_date
       -
         name: Code tables
         desc: These tables contain all national (koodistot.suomi.fi) and local codes used for classifying plan data.

@@ -13,7 +13,7 @@
 | status | varchar |  | false |  |  |  |
 | level | integer | 1 | false |  |  |  |
 | parent_id | uuid |  | true |  | [codes.type_of_underground](codes.type_of_underground.md) |  |
-| id | uuid | gen_random_uuid() | false | [codes.type_of_underground](codes.type_of_underground.md) [hame.land_use_area](hame.land_use_area.md) [hame.land_use_point](hame.land_use_point.md) [hame.line](hame.line.md) [hame.other_area](hame.other_area.md) [hame.other_point](hame.other_point.md) |  |  |
+| id | uuid | gen_random_uuid() | false | [codes.type_of_underground](codes.type_of_underground.md) [arho.land_use_area](arho.land_use_area.md) [arho.land_use_point](arho.land_use_point.md) [arho.line](arho.line.md) [arho.other_area](arho.other_area.md) [arho.other_point](arho.other_point.md) |  |  |
 | created_at | timestamp without time zone | now() | false |  |  |  |
 | modified_at | timestamp without time zone | now() | false |  |  |  |
 
@@ -37,8 +37,8 @@
 | type_of_underground_pkey | CREATE UNIQUE INDEX type_of_underground_pkey ON codes.type_of_underground USING btree (id) |
 | ix_codes_type_of_underground_level | CREATE INDEX ix_codes_type_of_underground_level ON codes.type_of_underground USING btree (level) |
 | ix_codes_type_of_underground_parent_id | CREATE INDEX ix_codes_type_of_underground_parent_id ON codes.type_of_underground USING btree (parent_id) |
-| ix_codes_type_of_underground_value | CREATE UNIQUE INDEX ix_codes_type_of_underground_value ON codes.type_of_underground USING btree (value) |
 | ix_codes_type_of_underground_short_name | CREATE INDEX ix_codes_type_of_underground_short_name ON codes.type_of_underground USING btree (short_name) |
+| ix_codes_type_of_underground_value | CREATE UNIQUE INDEX ix_codes_type_of_underground_value ON codes.type_of_underground USING btree (value) |
 
 ## Relations
 

@@ -13,7 +13,7 @@
 | status | varchar |  | false |  |  |  |
 | level | integer | 1 | false |  |  |  |
 | parent_id | uuid |  | true |  | [codes.plan_type](codes.plan_type.md) |  |
-| id | uuid | gen_random_uuid() | false | [hame.plan](hame.plan.md) [codes.plan_type](codes.plan_type.md) |  |  |
+| id | uuid | gen_random_uuid() | false | [codes.plan_type](codes.plan_type.md) [arho.plan](arho.plan.md) |  |  |
 | created_at | timestamp without time zone | now() | false |  |  |  |
 | modified_at | timestamp without time zone | now() | false |  |  |  |
 
@@ -37,8 +37,8 @@
 | plan_type_pkey | CREATE UNIQUE INDEX plan_type_pkey ON codes.plan_type USING btree (id) |
 | ix_codes_plan_type_level | CREATE INDEX ix_codes_plan_type_level ON codes.plan_type USING btree (level) |
 | ix_codes_plan_type_parent_id | CREATE INDEX ix_codes_plan_type_parent_id ON codes.plan_type USING btree (parent_id) |
-| ix_codes_plan_type_value | CREATE UNIQUE INDEX ix_codes_plan_type_value ON codes.plan_type USING btree (value) |
 | ix_codes_plan_type_short_name | CREATE INDEX ix_codes_plan_type_short_name ON codes.plan_type USING btree (short_name) |
+| ix_codes_plan_type_value | CREATE UNIQUE INDEX ix_codes_plan_type_value ON codes.plan_type USING btree (value) |
 
 ## Relations
 

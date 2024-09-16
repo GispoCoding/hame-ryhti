@@ -13,7 +13,7 @@
 | status | varchar |  | false |  |  |  |
 | level | integer | 1 | false |  |  |  |
 | parent_id | uuid |  | true |  | [codes.type_of_verbal_plan_regulation](codes.type_of_verbal_plan_regulation.md) |  |
-| id | uuid | gen_random_uuid() | false | [codes.type_of_verbal_plan_regulation](codes.type_of_verbal_plan_regulation.md) [hame.plan_regulation](hame.plan_regulation.md) |  |  |
+| id | uuid | gen_random_uuid() | false | [codes.type_of_verbal_plan_regulation](codes.type_of_verbal_plan_regulation.md) [arho.plan_regulation](arho.plan_regulation.md) |  |  |
 | created_at | timestamp without time zone | now() | false |  |  |  |
 | modified_at | timestamp without time zone | now() | false |  |  |  |
 
@@ -37,8 +37,8 @@
 | type_of_verbal_plan_regulation_pkey | CREATE UNIQUE INDEX type_of_verbal_plan_regulation_pkey ON codes.type_of_verbal_plan_regulation USING btree (id) |
 | ix_codes_type_of_verbal_plan_regulation_level | CREATE INDEX ix_codes_type_of_verbal_plan_regulation_level ON codes.type_of_verbal_plan_regulation USING btree (level) |
 | ix_codes_type_of_verbal_plan_regulation_parent_id | CREATE INDEX ix_codes_type_of_verbal_plan_regulation_parent_id ON codes.type_of_verbal_plan_regulation USING btree (parent_id) |
-| ix_codes_type_of_verbal_plan_regulation_value | CREATE UNIQUE INDEX ix_codes_type_of_verbal_plan_regulation_value ON codes.type_of_verbal_plan_regulation USING btree (value) |
 | ix_codes_type_of_verbal_plan_regulation_short_name | CREATE INDEX ix_codes_type_of_verbal_plan_regulation_short_name ON codes.type_of_verbal_plan_regulation USING btree (short_name) |
+| ix_codes_type_of_verbal_plan_regulation_value | CREATE UNIQUE INDEX ix_codes_type_of_verbal_plan_regulation_value ON codes.type_of_verbal_plan_regulation USING btree (value) |
 
 ## Relations
 

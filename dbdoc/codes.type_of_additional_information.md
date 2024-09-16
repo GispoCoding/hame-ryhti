@@ -13,7 +13,7 @@
 | status | varchar |  | false |  |  |  |
 | level | integer | 1 | false |  |  |  |
 | parent_id | uuid |  | true |  | [codes.type_of_additional_information](codes.type_of_additional_information.md) |  |
-| id | uuid | gen_random_uuid() | false | [codes.type_of_additional_information](codes.type_of_additional_information.md) [hame.plan_regulation](hame.plan_regulation.md) |  |  |
+| id | uuid | gen_random_uuid() | false | [codes.type_of_additional_information](codes.type_of_additional_information.md) [arho.plan_regulation](arho.plan_regulation.md) |  |  |
 | created_at | timestamp without time zone | now() | false |  |  |  |
 | modified_at | timestamp without time zone | now() | false |  |  |  |
 
@@ -37,8 +37,8 @@
 | type_of_additional_information_pkey | CREATE UNIQUE INDEX type_of_additional_information_pkey ON codes.type_of_additional_information USING btree (id) |
 | ix_codes_type_of_additional_information_level | CREATE INDEX ix_codes_type_of_additional_information_level ON codes.type_of_additional_information USING btree (level) |
 | ix_codes_type_of_additional_information_parent_id | CREATE INDEX ix_codes_type_of_additional_information_parent_id ON codes.type_of_additional_information USING btree (parent_id) |
-| ix_codes_type_of_additional_information_value | CREATE UNIQUE INDEX ix_codes_type_of_additional_information_value ON codes.type_of_additional_information USING btree (value) |
 | ix_codes_type_of_additional_information_short_name | CREATE INDEX ix_codes_type_of_additional_information_short_name ON codes.type_of_additional_information USING btree (short_name) |
+| ix_codes_type_of_additional_information_value | CREATE UNIQUE INDEX ix_codes_type_of_additional_information_value ON codes.type_of_additional_information USING btree (value) |
 
 ## Relations
 
