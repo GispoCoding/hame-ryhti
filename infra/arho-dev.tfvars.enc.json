@@ -8,20 +8,20 @@
 	"x-road_verification_record": "ENC[AES256_GCM,data:xLd+26KAzTfWmd5qe0myZpVT4Q4qnW3upuPvQ8kNvN7m1OvAVoNlij9L2ZxeiI/JqcbqpA==,iv:Gj72MBqy2hX+lQ84+ZP4xwxbaVvr/BdsgUiQPtxNyUM=,tag:X746TPmFqkX8WP/xj1xEgw==,type:str]",
 	"x-road_member_code": "ENC[AES256_GCM,data:6YMJNtSJyFpC,iv:FzKOnNGVG/yrHJXrN90yhBFUIU6zij/uI9Mbklo+YUU=,tag:2ec4HP1nRhC/QDbjR6ZSng==,type:str]",
 	"enable_route53_record": "ENC[AES256_GCM,data:YgQPyw==,iv:hXWQq7zDRGidWHxjncrS3qiRpA3pskGSk3rr+b4HuGk=,tag:9QHwlLtN+y4vVk7bqjPa1A==,type:bool]",
-	"hame_db_name": "ENC[AES256_GCM,data:g9p2BjNtTSc=,iv:UumP9WJjSojuGdLsbhdH1of2Pk4ruOglbiPC/MjuNXI=,tag:0bpsLC0Z6BYn+9c87LLGzA==,type:str]",
+	"arho_db_name": "ENC[AES256_GCM,data:g9p2BjNtTSc=,iv:UumP9WJjSojuGdLsbhdH1of2Pk4ruOglbiPC/MjuNXI=,tag:0bpsLC0Z6BYn+9c87LLGzA==,type:str]",
 	"su_secrets": {
 		"username": "ENC[AES256_GCM,data:2hSkSOBJkQ==,iv:svCLEBJxwDQ1cprx8jV6Vghks8c/EwWGuJZZFILdFe8=,tag:bpHqJ4XNpiiTw7BI7qfuzA==,type:str]",
 		"password": "ENC[AES256_GCM,data:sH9y0h8IRxRsEiw/5qlvYaH+y/S/OUf7EKVP0q4kcRXW3YdrjED6nn/9ZVIPH2GnRjfCkqzstLvDkWbLiLzRSyQsCT/z/mR0uV4xvmEiOmwVyR0qwKhO5QGIrjXthqdHo5nGDoGeDPTWnHz3xF6brEkPdWGGkPqKlssOW6QDfCg=,iv:Vim8UPdclIVycdEaf7ZSRHH0Di0GupW5UzS+3w6mEio=,tag:x6PQJr+muHhNXLgc+SVCiQ==,type:str]"
 	},
-	"hame_admin_secrets": {
+	"arho_admin_secrets": {
 		"username": "ENC[AES256_GCM,data:ieMEBcEi2Ey21Q==,iv:tvaa975YpP6eNJ5piDNqT+CNiaAhWjx2fHzsjzCPi6Q=,tag:87I0nZSYSNn1F+ikqbHc4g==,type:str]",
 		"password": "ENC[AES256_GCM,data:clmrmgnIYDvagU07KYP8WkJnueoTogEDR1YnU7QFNKPHFzwQFUpfDd7P/VQnRfEq/NzVSOnN2eTyuFreDIEgb1t1FMQuKmXtpEbLRUweDPo4T/ruEBv4iK9pmre61fZGsFkduKT6PaSUFVRd2hrC9mW+Q5gn92RXiB0zX02rCSM=,iv:xyE0gK1cDu2T1zDOTgYBAFg4RFLJ8KqqaD4vBZRF6+w=,tag:D+k3jZrmndydXpKtsjbYcw==,type:str]"
 	},
-	"hame_r_secrets": {
+	"arho_r_secrets": {
 		"username": "ENC[AES256_GCM,data:eMdC10iSybeE,iv:pFU7o9RAREwWXTfSXPPrTZjbXDEL6W5BJpv7iv2f3WU=,tag:Eg07+8fas0AeS0QEvMwtlA==,type:str]",
 		"password": "ENC[AES256_GCM,data:jSWUo8v/Y+WGB3IBqposAzV+ki3C0thoRgDTY2PNBF+vaSv2UaoaV4n9Ft1mmnKLvjqMOJYdPeEElLtZAjU1S4vsX6+8MwD4Q92kvZ4N1MGnQXehgBSqnFKvU4d1wjAuO3Gf2n9IyVjlP67KQM74ME+KQrfP+X0tmKEft0BAj8A=,iv:BqRKzyu6/zguC/eVGTwfUg8YN9x08XdELIMbBX/OCLI=,tag:XNZaqzTOE9tMsMnt4d+dwA==,type:str]"
 	},
-	"hame_rw_secrets": {
+	"arho_rw_secrets": {
 		"username": "ENC[AES256_GCM,data:B3U3oOku76xOhVtBtfDY,iv:WCSHLEgijKeNr7eCp5KY+HCOp0Ewe6qXeT4Um15YY1U=,tag:NsQuBP+rI4bTUP+FpuIq3Q==,type:str]",
 		"password": "ENC[AES256_GCM,data:qHmn/d0wjSdkeuSVMUi5CYoHm6So/bwUT7KY5ImaTVMhSrXoisI+hlsgn4bPRoQNHmueDGq1LHb90gguBm+dW0Swspmh9is/EG6IWpCvRh4AGFEYiLczMl6acSZvQ0vxGFxPWizA6wbO4NACtrsaWk7MR3blaKHF9faScn8hEDA=,iv:Bu2Q2gxHZ6sLoMFeIL1y3I2ATVML/sccdHOY8WlSPmo=,tag:dQgEe2A38Dcmw7FOqNFygg==,type:str]"
 	},
