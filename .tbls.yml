@@ -31,6 +31,12 @@ viewpoints:
       - codes.type_of_source_data
       - codes.type_of_underground
       - codes.type_of_verbal_plan_regulation
+      - codes.category_of_publicity
+      - codes.name_of_plan_case_decision
+      - codes.type_of_decision_maker
+      - codes.type_of_interaction_event
+      - codes.type_of_processing_event
+
     groups:
       -
         name: Plan geometry tables
@@ -72,3 +78,8 @@ viewpoints:
           - codes.type_of_source_data
           - codes.type_of_underground
           - codes.type_of_verbal_plan_regulation
+          - codes.category_of_publicity
+          - codes.name_of_plan_case_decision
+          - codes.type_of_decision_maker
+          - codes.type_of_interaction_event
+          - codes.type_of_processing_event

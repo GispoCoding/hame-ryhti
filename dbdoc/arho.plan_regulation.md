@@ -67,11 +67,11 @@
 
 | Name | Definition |
 | ---- | ---------- |
-| trg_plan_regulation_modified_at | CREATE TRIGGER trg_plan_regulation_modified_at BEFORE INSERT OR UPDATE ON arho.plan_regulation FOR EACH ROW EXECUTE FUNCTION arho.trgfunc_modified_at() |
-| trg_plan_regulation_new_lifecycle_date | CREATE TRIGGER trg_plan_regulation_new_lifecycle_date BEFORE UPDATE ON arho.plan_regulation FOR EACH ROW WHEN ((new.lifecycle_status_id <> old.lifecycle_status_id)) EXECUTE FUNCTION arho.trgfunc_plan_regulation_new_lifecycle_date() |
 | trg_plan_regulation_land_use_area_new_lifecycle_status | CREATE TRIGGER trg_plan_regulation_land_use_area_new_lifecycle_status BEFORE INSERT ON arho.plan_regulation FOR EACH ROW EXECUTE FUNCTION arho.trgfunc_plan_regulation_land_use_area_new_lifecycle_status() |
 | trg_plan_regulation_land_use_point_new_lifecycle_status | CREATE TRIGGER trg_plan_regulation_land_use_point_new_lifecycle_status BEFORE INSERT ON arho.plan_regulation FOR EACH ROW EXECUTE FUNCTION arho.trgfunc_plan_regulation_land_use_point_new_lifecycle_status() |
 | trg_plan_regulation_line_new_lifecycle_status | CREATE TRIGGER trg_plan_regulation_line_new_lifecycle_status BEFORE INSERT ON arho.plan_regulation FOR EACH ROW EXECUTE FUNCTION arho.trgfunc_plan_regulation_line_new_lifecycle_status() |
+| trg_plan_regulation_modified_at | CREATE TRIGGER trg_plan_regulation_modified_at BEFORE INSERT OR UPDATE ON arho.plan_regulation FOR EACH ROW EXECUTE FUNCTION arho.trgfunc_modified_at() |
+| trg_plan_regulation_new_lifecycle_date | CREATE TRIGGER trg_plan_regulation_new_lifecycle_date BEFORE UPDATE ON arho.plan_regulation FOR EACH ROW WHEN ((new.lifecycle_status_id <> old.lifecycle_status_id)) EXECUTE FUNCTION arho.trgfunc_plan_regulation_new_lifecycle_date() |
 | trg_plan_regulation_other_area_new_lifecycle_status | CREATE TRIGGER trg_plan_regulation_other_area_new_lifecycle_status BEFORE INSERT ON arho.plan_regulation FOR EACH ROW EXECUTE FUNCTION arho.trgfunc_plan_regulation_other_area_new_lifecycle_status() |
 | trg_plan_regulation_other_point_new_lifecycle_status | CREATE TRIGGER trg_plan_regulation_other_point_new_lifecycle_status BEFORE INSERT ON arho.plan_regulation FOR EACH ROW EXECUTE FUNCTION arho.trgfunc_plan_regulation_other_point_new_lifecycle_status() |
 | trg_plan_regulation_plan_new_lifecycle_status | CREATE TRIGGER trg_plan_regulation_plan_new_lifecycle_status BEFORE INSERT ON arho.plan_regulation FOR EACH ROW EXECUTE FUNCTION arho.trgfunc_plan_regulation_plan_new_lifecycle_status() |

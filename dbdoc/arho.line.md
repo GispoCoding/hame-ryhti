@@ -54,12 +54,12 @@
 
 | Name | Definition |
 | ---- | ---------- |
+| trg_line_add_plan_id_fkey | CREATE TRIGGER trg_line_add_plan_id_fkey BEFORE INSERT ON arho.line FOR EACH ROW EXECUTE FUNCTION arho.trgfunc_add_plan_id_fkey() |
 | trg_line_modified_at | CREATE TRIGGER trg_line_modified_at BEFORE INSERT OR UPDATE ON arho.line FOR EACH ROW EXECUTE FUNCTION arho.trgfunc_modified_at() |
 | trg_line_new_lifecycle_date | CREATE TRIGGER trg_line_new_lifecycle_date BEFORE UPDATE ON arho.line FOR EACH ROW WHEN ((new.lifecycle_status_id <> old.lifecycle_status_id)) EXECUTE FUNCTION arho.trgfunc_line_new_lifecycle_date() |
-| trg_line_plan_regulation_update_lifecycle_status | CREATE TRIGGER trg_line_plan_regulation_update_lifecycle_status BEFORE UPDATE ON arho.line FOR EACH ROW WHEN ((new.lifecycle_status_id <> old.lifecycle_status_id)) EXECUTE FUNCTION arho.trgfunc_line_plan_regulation_update_lifecycle_status() |
-| trg_line_plan_proposition_update_lifecycle_status | CREATE TRIGGER trg_line_plan_proposition_update_lifecycle_status BEFORE UPDATE ON arho.line FOR EACH ROW WHEN ((new.lifecycle_status_id <> old.lifecycle_status_id)) EXECUTE FUNCTION arho.trgfunc_line_plan_proposition_update_lifecycle_status() |
 | trg_line_new_lifecycle_status | CREATE TRIGGER trg_line_new_lifecycle_status BEFORE INSERT ON arho.line FOR EACH ROW WHEN ((new.plan_id IS NOT NULL)) EXECUTE FUNCTION arho.trgfunc_line_new_lifecycle_status() |
-| trg_line_add_plan_id_fkey | CREATE TRIGGER trg_line_add_plan_id_fkey BEFORE INSERT ON arho.line FOR EACH ROW EXECUTE FUNCTION arho.trgfunc_add_plan_id_fkey() |
+| trg_line_plan_proposition_update_lifecycle_status | CREATE TRIGGER trg_line_plan_proposition_update_lifecycle_status BEFORE UPDATE ON arho.line FOR EACH ROW WHEN ((new.lifecycle_status_id <> old.lifecycle_status_id)) EXECUTE FUNCTION arho.trgfunc_line_plan_proposition_update_lifecycle_status() |
+| trg_line_plan_regulation_update_lifecycle_status | CREATE TRIGGER trg_line_plan_regulation_update_lifecycle_status BEFORE UPDATE ON arho.line FOR EACH ROW WHEN ((new.lifecycle_status_id <> old.lifecycle_status_id)) EXECUTE FUNCTION arho.trgfunc_line_plan_regulation_update_lifecycle_status() |
 | trg_line_validate_geometry | CREATE TRIGGER trg_line_validate_geometry BEFORE INSERT OR UPDATE ON arho.line FOR EACH ROW EXECUTE FUNCTION arho.trgfunc_line_validate_geometry() |
 
 ## Relations

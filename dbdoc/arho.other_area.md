@@ -54,14 +54,14 @@
 
 | Name | Definition |
 | ---- | ---------- |
+| trg_other_area_add_plan_id_fkey | CREATE TRIGGER trg_other_area_add_plan_id_fkey BEFORE INSERT ON arho.other_area FOR EACH ROW EXECUTE FUNCTION arho.trgfunc_add_plan_id_fkey() |
+| trg_other_area_insert_intersecting_geometries | CREATE TRIGGER trg_other_area_insert_intersecting_geometries BEFORE INSERT ON arho.other_area FOR EACH ROW EXECUTE FUNCTION arho.trgfunc_other_area_insert_intersecting_geometries() |
 | trg_other_area_modified_at | CREATE TRIGGER trg_other_area_modified_at BEFORE INSERT OR UPDATE ON arho.other_area FOR EACH ROW EXECUTE FUNCTION arho.trgfunc_modified_at() |
 | trg_other_area_new_lifecycle_date | CREATE TRIGGER trg_other_area_new_lifecycle_date BEFORE UPDATE ON arho.other_area FOR EACH ROW WHEN ((new.lifecycle_status_id <> old.lifecycle_status_id)) EXECUTE FUNCTION arho.trgfunc_other_area_new_lifecycle_date() |
-| trg_other_area_plan_regulation_update_lifecycle_status | CREATE TRIGGER trg_other_area_plan_regulation_update_lifecycle_status BEFORE UPDATE ON arho.other_area FOR EACH ROW WHEN ((new.lifecycle_status_id <> old.lifecycle_status_id)) EXECUTE FUNCTION arho.trgfunc_other_area_plan_regulation_update_lifecycle_status() |
-| trg_other_area_plan_proposition_update_lifecycle_status | CREATE TRIGGER trg_other_area_plan_proposition_update_lifecycle_status BEFORE UPDATE ON arho.other_area FOR EACH ROW WHEN ((new.lifecycle_status_id <> old.lifecycle_status_id)) EXECUTE FUNCTION arho.trgfunc_other_area_plan_proposition_update_lifecycle_status() |
 | trg_other_area_new_lifecycle_status | CREATE TRIGGER trg_other_area_new_lifecycle_status BEFORE INSERT ON arho.other_area FOR EACH ROW WHEN ((new.plan_id IS NOT NULL)) EXECUTE FUNCTION arho.trgfunc_other_area_new_lifecycle_status() |
-| trg_other_area_add_plan_id_fkey | CREATE TRIGGER trg_other_area_add_plan_id_fkey BEFORE INSERT ON arho.other_area FOR EACH ROW EXECUTE FUNCTION arho.trgfunc_add_plan_id_fkey() |
+| trg_other_area_plan_proposition_update_lifecycle_status | CREATE TRIGGER trg_other_area_plan_proposition_update_lifecycle_status BEFORE UPDATE ON arho.other_area FOR EACH ROW WHEN ((new.lifecycle_status_id <> old.lifecycle_status_id)) EXECUTE FUNCTION arho.trgfunc_other_area_plan_proposition_update_lifecycle_status() |
+| trg_other_area_plan_regulation_update_lifecycle_status | CREATE TRIGGER trg_other_area_plan_regulation_update_lifecycle_status BEFORE UPDATE ON arho.other_area FOR EACH ROW WHEN ((new.lifecycle_status_id <> old.lifecycle_status_id)) EXECUTE FUNCTION arho.trgfunc_other_area_plan_regulation_update_lifecycle_status() |
 | trg_other_area_validate_polygon_geometry | CREATE TRIGGER trg_other_area_validate_polygon_geometry BEFORE INSERT OR UPDATE ON arho.other_area FOR EACH ROW EXECUTE FUNCTION arho.trgfunc_validate_polygon_geometry() |
-| trg_other_area_insert_intersecting_geometries | CREATE TRIGGER trg_other_area_insert_intersecting_geometries BEFORE INSERT ON arho.other_area FOR EACH ROW EXECUTE FUNCTION arho.trgfunc_other_area_insert_intersecting_geometries() |
 
 ## Relations
 

@@ -54,15 +54,15 @@
 
 | Name | Definition |
 | ---- | ---------- |
-| trg_plan_modified_at | CREATE TRIGGER trg_plan_modified_at BEFORE INSERT OR UPDATE ON arho.plan FOR EACH ROW EXECUTE FUNCTION arho.trgfunc_modified_at() |
-| trg_plan_new_lifecycle_date | CREATE TRIGGER trg_plan_new_lifecycle_date BEFORE UPDATE ON arho.plan FOR EACH ROW WHEN ((new.lifecycle_status_id <> old.lifecycle_status_id)) EXECUTE FUNCTION arho.trgfunc_plan_new_lifecycle_date() |
 | trg_land_use_area_update_lifecycle_status | CREATE TRIGGER trg_land_use_area_update_lifecycle_status BEFORE UPDATE ON arho.plan FOR EACH ROW WHEN ((new.lifecycle_status_id <> old.lifecycle_status_id)) EXECUTE FUNCTION arho.trgfunc_land_use_area_update_lifecycle_status() |
 | trg_land_use_point_update_lifecycle_status | CREATE TRIGGER trg_land_use_point_update_lifecycle_status BEFORE UPDATE ON arho.plan FOR EACH ROW WHEN ((new.lifecycle_status_id <> old.lifecycle_status_id)) EXECUTE FUNCTION arho.trgfunc_land_use_point_update_lifecycle_status() |
 | trg_line_update_lifecycle_status | CREATE TRIGGER trg_line_update_lifecycle_status BEFORE UPDATE ON arho.plan FOR EACH ROW WHEN ((new.lifecycle_status_id <> old.lifecycle_status_id)) EXECUTE FUNCTION arho.trgfunc_line_update_lifecycle_status() |
 | trg_other_area_update_lifecycle_status | CREATE TRIGGER trg_other_area_update_lifecycle_status BEFORE UPDATE ON arho.plan FOR EACH ROW WHEN ((new.lifecycle_status_id <> old.lifecycle_status_id)) EXECUTE FUNCTION arho.trgfunc_other_area_update_lifecycle_status() |
 | trg_other_point_update_lifecycle_status | CREATE TRIGGER trg_other_point_update_lifecycle_status BEFORE UPDATE ON arho.plan FOR EACH ROW WHEN ((new.lifecycle_status_id <> old.lifecycle_status_id)) EXECUTE FUNCTION arho.trgfunc_other_point_update_lifecycle_status() |
-| trg_plan_plan_regulation_update_lifecycle_status | CREATE TRIGGER trg_plan_plan_regulation_update_lifecycle_status BEFORE UPDATE ON arho.plan FOR EACH ROW WHEN ((new.lifecycle_status_id <> old.lifecycle_status_id)) EXECUTE FUNCTION arho.trgfunc_plan_plan_regulation_update_lifecycle_status() |
+| trg_plan_modified_at | CREATE TRIGGER trg_plan_modified_at BEFORE INSERT OR UPDATE ON arho.plan FOR EACH ROW EXECUTE FUNCTION arho.trgfunc_modified_at() |
+| trg_plan_new_lifecycle_date | CREATE TRIGGER trg_plan_new_lifecycle_date BEFORE UPDATE ON arho.plan FOR EACH ROW WHEN ((new.lifecycle_status_id <> old.lifecycle_status_id)) EXECUTE FUNCTION arho.trgfunc_plan_new_lifecycle_date() |
 | trg_plan_plan_proposition_update_lifecycle_status | CREATE TRIGGER trg_plan_plan_proposition_update_lifecycle_status BEFORE UPDATE ON arho.plan FOR EACH ROW WHEN ((new.lifecycle_status_id <> old.lifecycle_status_id)) EXECUTE FUNCTION arho.trgfunc_plan_plan_proposition_update_lifecycle_status() |
+| trg_plan_plan_regulation_update_lifecycle_status | CREATE TRIGGER trg_plan_plan_regulation_update_lifecycle_status BEFORE UPDATE ON arho.plan FOR EACH ROW WHEN ((new.lifecycle_status_id <> old.lifecycle_status_id)) EXECUTE FUNCTION arho.trgfunc_plan_plan_regulation_update_lifecycle_status() |
 | trg_plan_validate_polygon_geometry | CREATE TRIGGER trg_plan_validate_polygon_geometry BEFORE INSERT OR UPDATE ON arho.plan FOR EACH ROW EXECUTE FUNCTION arho.trgfunc_validate_polygon_geometry() |
 
 ## Relations

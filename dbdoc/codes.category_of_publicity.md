@@ -17,6 +17,12 @@
 | created_at | timestamp without time zone | now() | false |  |  |  |
 | modified_at | timestamp without time zone | now() | false |  |  |  |
 
+## Viewpoints
+
+| Name | Definition |
+| ---- | ---------- |
+| [All tables](viewpoint-0.md) | All tables that make up maakuntakaava plan data. |
+
 ## Constraints
 
 | Name | Type | Definition |
