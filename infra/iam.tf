@@ -58,6 +58,46 @@ resource "aws_iam_role_policy_attachment" "lambda_secrets_attachment" {
   policy_arn = aws_iam_policy.secrets-policy.arn
 }
 
+# Allow lambda to access ECR. This should be created automatically when ECR images are
+# added to lambda, but apparently that does not happen:
+# https://docs.aws.amazon.com/lambda/latest/dg/images-create.html#gettingstarted-images-permissions
+
+resource "aws_iam_policy" "ecr-policy" {
+  # We need a separate policy for each hame instance, since they have separate secrets
+  name        = "${var.prefix}-lambda-ecr-policy"
+  path        = "/"
+  description = "Lambda ECR image access policy"
+
+  policy = jsonencode({
+    Version   = "2012-10-17"
+    Statement = [
+      {
+      "Sid": "LambdaECRImageRetrievalPolicy",
+      "Effect": "Allow",
+      "Action": [
+        "ecr:BatchGetImage",
+        "ecr:DeleteRepositoryPolicy",
+        "ecr:GetDownloadUrlForLayer",
+        "ecr:GetRepositoryPolicy",
+        "ecr:SetRepositoryPolicy"
+      ],
+      "Resource" : [
+        aws_ecr_repository.db_manager.arn,
+        aws_ecr_repository.koodistot_loader.arn,
+        aws_ecr_repository.ryhti_client.arn,
+        aws_ecr_repository.mml_loader.arn
+        ]
+    }
+    ]
+  })
+  tags   = merge(local.default_tags, { Name = "${var.prefix}-lambda-ecr-policy" })
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_ecr_attachment" {
+  role       = aws_iam_role.lambda_exec.name
+  policy_arn = aws_iam_policy.ecr-policy.arn
+}
+
 
 # Lambda update user
 resource "aws_iam_user" "lambda_update_user" {
