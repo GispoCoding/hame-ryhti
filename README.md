@@ -4,7 +4,7 @@
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
 
 ARHO land use planning database and QGIS project compatible with [national Ryhti data model](https://ryhti.syke.fi/alueidenkaytto/tietomallimuotoinen-kaavoitus/) -
-[Ryhti-yhteensopiva](https://ryhti.syke.fi/alueidenkaytto/tietomallimuotoinen-kaavoitus/) tietokanta ja QGIS-projekti maakuntakaavoitukseen.
+[Ryhti-yhteensopiva](https://ryhti.syke.fi/alueidenkaytto/tietomallimuotoinen-kaavoitus/) tietokanta ja QGIS-projekti yleis- maakunta- ja asemakaavoitukseen.
 
 The database and functions can be run on AWS (Amazon Web Services) cloud platform.
 
