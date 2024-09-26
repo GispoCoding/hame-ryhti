@@ -254,6 +254,7 @@ def valid_plan_in_preparation(
     point_text_plan_regulation_instance: models.PlanRegulation,
     numeric_plan_regulation_instance: models.PlanRegulation,
     verbal_plan_regulation_instance: models.PlanRegulation,
+    intended_use_plan_regulation_instance: models.PlanRegulation,
     general_plan_regulation_instance: models.PlanRegulation,
     plan_proposition_instance: models.PlanProposition,
 ):
@@ -284,6 +285,7 @@ def valid_plan_in_preparation(
     numeric_plan_regulation_instance.plan_theme = community_structure_theme
     verbal_plan_regulation_instance.plan_theme = community_structure_theme
     general_plan_regulation_instance.plan_theme = community_structure_theme
+    intended_use_plan_regulation_instance.plan_theme = community_structure_theme
 
     # Kaavamääräyksen tyyppi
     detached_houses_type = (
@@ -301,6 +303,7 @@ def valid_plan_in_preparation(
         .first()
     )
     verbal_plan_regulation_instance.type_of_plan_regulation = verbal_type
+    intended_use_plan_regulation_instance.type_of_plan_regulation = detached_houses_type
 
     # Sanallisen kaavamääräyksen laji
     foundation_type_of_verbal_regulation = (
@@ -324,6 +327,21 @@ def valid_plan_in_preparation(
     numeric_plan_regulation_instance.intended_use = (
         principal_intended_use_type_of_additional_information
     )
+    intended_use_plan_regulation_instance.intended_use = (
+        principal_intended_use_type_of_additional_information
+    )
+    intended_use_allocation_type_of_additional_information = (
+        session.query(codes.TypeOfAdditionalInformation)
+        .filter_by(value="kayttotarkoitusKohdistus")
+        .first()
+    )
+    intended_use_plan_regulation_instance.intended_use_allocation_or_exclusion = (
+        intended_use_allocation_type_of_additional_information
+    )
+    intended_use_plan_regulation_instance.first_intended_use_allocation = (
+        detached_houses_type
+    )
+
     # General and verbal regulation type may *not* be intended use regulation!
     verbal_plan_regulation_instance.intended_use = None
     general_plan_regulation_instance.intended_use = None

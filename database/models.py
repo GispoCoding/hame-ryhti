@@ -187,7 +187,10 @@ class PlanRegulation(PlanBase):
     )
     # Let's load all the codes for objects joined.
     type_of_plan_regulation = relationship(
-        "TypeOfPlanRegulation", backref="plan_regulations", lazy="joined"
+        "TypeOfPlanRegulation",
+        foreign_keys=[type_of_plan_regulation_id],
+        backref="plan_regulations",
+        lazy="joined",
     )
     # Let's load all the codes for objects joined.
     type_of_verbal_plan_regulation = relationship(
@@ -204,6 +207,33 @@ class PlanRegulation(PlanBase):
         ),
         nullable=True,
     )
+    # Käyttötarkoituskohdistus/poisluettava käyttötarkoitus
+    intended_use_allocation_or_exclusion_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey(
+            "codes.type_of_additional_information.id",
+            name="intended_use_allocation_or_exclusion_id_fkey",
+        ),
+        nullable=True,
+    )
+    # Käyttötarkoituskohdistuksen/poisluettavan käyttötarkoituksen kaavamääräyksen
+    # tyyppi
+    # https://koodistot.suomi.fi/code;registryCode=rytj;schemeCode=RY_Kaavamaarayksen_Lisatiedonlaji;codeCode=kayttotarkoituskohdistus
+    # https://koodistot.suomi.fi/code;registryCode=rytj;schemeCode=RY_Kaavamaarayksen_Lisatiedonlaji;codeCode=poisluettavaKayttotarkoitus
+    first_intended_use_allocation_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey(
+            "codes.type_of_plan_regulation.id",
+            name="first_intended_use_allocation_id_fkey",
+        ),
+        nullable=True,
+    )
+    second_intended_use_allocation_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey(
+            "codes.type_of_plan_regulation.id",
+            name="second_intended_use_allocation_id_fkey",
+        ),
+        nullable=True,
+    )
+
     # Olemassaolo
     existence_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey(
@@ -267,6 +297,26 @@ class PlanRegulation(PlanBase):
         backref="intended_use_plan_regulations",
         lazy="joined",
     )
+    # Let's load all the codes for objects joined.
+    intended_use_allocation_or_exclusion = relationship(
+        "TypeOfAdditionalInformation",
+        foreign_keys=[intended_use_allocation_or_exclusion_id],
+        backref="intended_use_allocation_plan_regulations",
+        lazy="joined",
+    )
+    first_intended_use_allocation = relationship(
+        "TypeOfPlanRegulation",
+        foreign_keys=[first_intended_use_allocation_id],
+        backref="first_intended_use_plan_regulations",
+        lazy="joined",
+    )
+    second_intended_use_allocation = relationship(
+        "TypeOfPlanRegulation",
+        foreign_keys=[second_intended_use_allocation_id],
+        backref="second_intended_use_plan_regulations",
+        lazy="joined",
+    )
+
     existence = relationship(
         "TypeOfAdditionalInformation",
         foreign_keys=[existence_id],

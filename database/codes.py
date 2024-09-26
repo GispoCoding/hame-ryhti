@@ -58,9 +58,15 @@ class TypeOfAdditionalInformation(CodeBase):
             "child_values": [
                 "paakayttotarkoitus",
                 "osaAlue",
-                "poisluettavaKayttotarkoitus",
                 "yhteystarve",
             ],
+        },
+        {
+            "value": "kayttotarkoituskohdistusTaiPoisluettavaKayttotarkoitus",
+            "name": {
+                "fin": "Käyttötarkoituskohdistus tai poisluettava käyttötarkoitus"
+            },
+            "child_values": ["kayttotarkoituskohdistus", "poisluettavaKayttotarkoitus"],
         },
         {
             "value": "olemassaolo",

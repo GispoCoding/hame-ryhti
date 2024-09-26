@@ -202,11 +202,33 @@ def test_plan_regulation(
         type_of_verbal_plan_regulation_instance
     )
     text_plan_regulation_instance.plan_theme = plan_theme_instance
-    # All eight additional information regulations are nullable
+    # All nine additional information regulations (plus two intended use types) are nullable
     # Käyttötarkoitus
     assert text_plan_regulation_instance.intended_use is None
     assert type_of_additional_information_instance.intended_use_plan_regulations == []
     text_plan_regulation_instance.intended_use = type_of_additional_information_instance
+    # Käyttötarkoituskohdistus/poisluettava käyttötarkoitus
+    assert text_plan_regulation_instance.intended_use_allocation_or_exclusion is None
+    assert (
+        type_of_additional_information_instance.intended_use_allocation_plan_regulations
+        == []
+    )
+    text_plan_regulation_instance.intended_use_allocation_or_exclusion = (
+        type_of_additional_information_instance
+    )
+    # Käyttötarkoituskohdistuksen/poisluettavan käyttötarkoituksen kaavamääräyksen
+    # tyyppi
+    assert text_plan_regulation_instance.first_intended_use_allocation is None
+    assert text_plan_regulation_instance.second_intended_use_allocation is None
+    assert type_of_plan_regulation_instance.first_intended_use_plan_regulations == []
+    assert type_of_plan_regulation_instance.second_intended_use_plan_regulations == []
+    text_plan_regulation_instance.first_intended_use_allocation = (
+        type_of_plan_regulation_instance
+    )
+    text_plan_regulation_instance.second_intended_use_allocation = (
+        type_of_plan_regulation_instance
+    )
+
     # Olemassaolo
     assert text_plan_regulation_instance.existence is None
     assert type_of_additional_information_instance.existence_plan_regulations == []
@@ -259,6 +281,7 @@ def test_plan_regulation(
     ]
     assert text_plan_regulation_instance.plan_theme is plan_theme_instance
     assert plan_theme_instance.plan_regulations == [text_plan_regulation_instance]
+
     # Käyttötarkoitus
     assert (
         text_plan_regulation_instance.intended_use
@@ -267,6 +290,32 @@ def test_plan_regulation(
     assert type_of_additional_information_instance.intended_use_plan_regulations == [
         text_plan_regulation_instance
     ]
+    # Käyttötarkoituskohdistus/poisluettava käyttötarkoitus
+    assert (
+        text_plan_regulation_instance.intended_use_allocation_or_exclusion
+        is type_of_additional_information_instance
+    )
+    assert (
+        type_of_additional_information_instance.intended_use_allocation_plan_regulations
+        == [text_plan_regulation_instance]
+    )
+    # Käyttötarkoituskohdistuksen/poisluettavan käyttötarkoituksen kaavamääräyksen
+    # tyyppi
+    assert (
+        text_plan_regulation_instance.first_intended_use_allocation
+        is type_of_plan_regulation_instance
+    )
+    assert (
+        text_plan_regulation_instance.second_intended_use_allocation
+        is type_of_plan_regulation_instance
+    )
+    assert type_of_plan_regulation_instance.first_intended_use_plan_regulations == [
+        text_plan_regulation_instance
+    ]
+    assert type_of_plan_regulation_instance.second_intended_use_plan_regulations == [
+        text_plan_regulation_instance
+    ]
+
     # Olemassaolo
     assert (
         text_plan_regulation_instance.existence

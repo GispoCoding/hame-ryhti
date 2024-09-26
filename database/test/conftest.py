@@ -903,6 +903,25 @@ def verbal_plan_regulation_instance(
 
 
 @pytest.fixture(scope="module")
+def intended_use_plan_regulation_instance(
+    session,
+    preparation_status_instance,
+    type_of_plan_regulation_instance,
+    plan_regulation_group_instance,
+):
+    instance = models.PlanRegulation(
+        name={"fin": "test_regulation"},
+        lifecycle_status=preparation_status_instance,
+        type_of_plan_regulation=type_of_plan_regulation_instance,
+        plan_regulation_group=plan_regulation_group_instance,
+        ordering=4,
+    )
+    session.add(instance)
+    session.commit()
+    return instance
+
+
+@pytest.fixture(scope="module")
 def general_plan_regulation_instance(
     session,
     preparation_status_instance,
@@ -988,10 +1007,12 @@ def complete_test_plan(
     point_text_plan_regulation_instance: models.PlanRegulation,
     numeric_plan_regulation_instance: models.PlanRegulation,
     verbal_plan_regulation_instance: models.PlanRegulation,
+    intended_use_plan_regulation_instance: models.PlanRegulation,
     general_plan_regulation_instance: models.PlanRegulation,
     plan_proposition_instance: models.PlanProposition,
     plan_theme_instance: codes.PlanTheme,
     type_of_additional_information_instance: codes.TypeOfAdditionalInformation,
+    type_of_plan_regulation_instance: codes.TypeOfPlanRegulation,
     participation_plan_presenting_for_public_decision: codes.NameOfPlanCaseDecision,
     plan_material_presenting_for_public_decision: codes.NameOfPlanCaseDecision,
     draft_plan_presenting_for_public_decision: codes.NameOfPlanCaseDecision,
@@ -1025,6 +1046,13 @@ def complete_test_plan(
     verbal_plan_regulation_instance.plan_theme = plan_theme_instance
     verbal_plan_regulation_instance.intended_use = (
         type_of_additional_information_instance
+    )
+    intended_use_plan_regulation_instance.plan_theme = plan_theme_instance
+    intended_use_plan_regulation_instance.intended_use_allocation_or_exclusion = (
+        type_of_additional_information_instance
+    )
+    intended_use_plan_regulation_instance.first_intended_use_allocation = (
+        type_of_plan_regulation_instance
     )
     general_plan_regulation_instance.plan_theme = plan_theme_instance
     general_plan_regulation_instance.intended_use = (
