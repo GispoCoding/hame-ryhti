@@ -8,20 +8,20 @@
 	"x-road_verification_record": "<Verification record for your X-road server domain, if requested by DVV>",
 	"x-road_member_code": "<X-Road member code of your X-road organization>",
     "enable_route53_record": true,
-    "arho_db_name": "<Name of the database to create>",
+    "hame_db_name": "<Name of the database to create>",
     "su_secrets": {
         "username": "<Superuser name>",
         "password": "<Superuser password>"
     },
-    "arho_admin_secrets": {
+    "hame_admin_secrets": {
         "username": "<Admin user name>",
         "password": "<Admin user password>"
     },
-    "arho_r_secrets": {
+    "hame_r_secrets": {
         "username": "<Read user name>",
         "password": "<Read user password>"
     },
-    "arho_rw_secrets": {
+    "hame_rw_secrets": {
         "username": "<Read & write user name>",
         "password": "<Read & write user password>"
     },
