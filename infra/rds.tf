@@ -1,4 +1,4 @@
-resource "aws_db_parameter_group" "hame" {
+resource "aws_db_parameter_group" "arho" {
   name   = "${var.prefix}-params"
   family = "postgres13"
 
@@ -10,7 +10,7 @@ resource "aws_db_parameter_group" "hame" {
 }
 
 resource "aws_db_instance" "main_db" {
-  identifier             = "${var.hame_db_name}db"
+  identifier             = "${var.arho_db_name}db"
   instance_class         = var.db_instance_type
   allocated_storage      = var.db_storage
   enabled_cloudwatch_logs_exports = ["postgresql", "upgrade"]
@@ -20,7 +20,7 @@ resource "aws_db_instance" "main_db" {
   password               = var.su_secrets.password
   db_subnet_group_name   = aws_db_subnet_group.db.name
   vpc_security_group_ids = [aws_security_group.rds.id]
-  parameter_group_name   = aws_db_parameter_group.hame.name
+  parameter_group_name   = aws_db_parameter_group.arho.name
   multi_az               = false
   apply_immediately      = false
   publicly_accessible    = false
@@ -30,7 +30,7 @@ resource "aws_db_instance" "main_db" {
 }
 
 resource "aws_db_instance" "xroad_db" {
-  identifier             = "${var.hame_db_name}-xroad-db"
+  identifier             = "${var.arho_db_name}-xroad-db"
   instance_class         = var.db_instance_type
   allocated_storage      = var.db_storage
   enabled_cloudwatch_logs_exports = ["postgresql", "upgrade"]
@@ -40,7 +40,7 @@ resource "aws_db_instance" "xroad_db" {
   password               = var.x-road_db_password
   db_subnet_group_name   = aws_db_subnet_group.db.name
   vpc_security_group_ids = [aws_security_group.rds.id]
-  parameter_group_name   = aws_db_parameter_group.hame.name
+  parameter_group_name   = aws_db_parameter_group.arho.name
   multi_az               = false
   apply_immediately      = false
   publicly_accessible    = false

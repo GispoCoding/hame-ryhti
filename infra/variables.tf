@@ -88,8 +88,8 @@ variable "db_postgres_version" {
   default     = "13.13"
 }
 
-variable "hame_db_name" {
-  description = "Hame DB Name"
+variable "arho_db_name" {
+  description = "Arho DB Name"
   type        = string
   default     = "db"
 }
@@ -98,15 +98,15 @@ variable "su_secrets" {
   nullable = false
 }
 
-variable "hame_admin_secrets" {
+variable "arho_admin_secrets" {
   nullable = false
 }
 
-variable "hame_r_secrets" {
+variable "arho_r_secrets" {
   nullable = false
 }
 
-variable "hame_rw_secrets" {
+variable "arho_rw_secrets" {
   nullable = false
 }
 

@@ -1,7 +1,7 @@
 
 # Lambda role
 resource "aws_iam_role" "lambda_exec" {
-  # Separate roles for each hame instance
+  # Separate roles for each arho instance
   name               = "${var.prefix}_serverless_lambda"
   assume_role_policy = jsonencode({
     Version   = "2012-10-17"
@@ -25,7 +25,7 @@ resource "aws_iam_role_policy_attachment" "lambda_policy" {
 
 # Create the policy to access secrets manager in the region
 resource "aws_iam_policy" "secrets-policy" {
-  # We need a separate policy for each hame instance, since they have separate secrets
+  # We need a separate policy for each arho instance, since they have separate secrets
   name        = "${var.prefix}-lambda-secrets-policy"
   path        = "/"
   description = "Lambda db secrets policy"
@@ -42,10 +42,10 @@ resource "aws_iam_policy" "secrets-policy" {
         ],
         Effect   = "Allow",
         Resource = [
-          aws_secretsmanager_secret.hame-db-su.arn,
-          aws_secretsmanager_secret.hame-db-admin.arn,
-          aws_secretsmanager_secret.hame-db-rw.arn,
-          aws_secretsmanager_secret.hame-db-r.arn
+          aws_secretsmanager_secret.arho-db-su.arn,
+          aws_secretsmanager_secret.arho-db-admin.arn,
+          aws_secretsmanager_secret.arho-db-rw.arn,
+          aws_secretsmanager_secret.arho-db-r.arn
         ]
       }
     ]
@@ -67,7 +67,7 @@ resource "aws_iam_user" "lambda_update_user" {
 
 # Create the policy to update lambda functions
 resource "aws_iam_policy" "lambda_update_policy" {
-  # We need a separate policy for each hame instance, since they have separate lambda functions
+  # We need a separate policy for each arho instance, since they have separate lambda functions
   name        = "${var.prefix}-lambda_update_policy"
   path        = "/"
   description = "Github CI lambda update policy"

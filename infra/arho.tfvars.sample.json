@@ -10,20 +10,20 @@
     "x-road_member_class": "<X-Road member class of your X-Road organization. Default is MUN.",
     "x-road_member_code": "<X-Road member code of your X-Road organization, usually its Y-tunnus>",
     "enable_route53_record": true,
-    "hame_db_name": "<Name of the database to create>",
+    "arho_db_name": "<Name of the database to create>",
     "su_secrets": {
         "username": "<Superuser name>",
         "password": "<Superuser password>"
     },
-    "hame_admin_secrets": {
+    "arho_admin_secrets": {
         "username": "<Admin user name>",
         "password": "<Admin user password>"
     },
-    "hame_r_secrets": {
+    "arho_r_secrets": {
         "username": "<Read user name>",
         "password": "<Read user password>"
     },
-    "hame_rw_secrets": {
+    "arho_rw_secrets": {
         "username": "<Read & write user name>",
         "password": "<Read & write user password>"
     },
