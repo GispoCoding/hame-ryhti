@@ -45,7 +45,7 @@ resource "aws_iam_policy" "secrets-policy" {
           aws_secretsmanager_secret.arho-db-su.arn,
           aws_secretsmanager_secret.arho-db-admin.arn,
           aws_secretsmanager_secret.arho-db-rw.arn,
-          aws_secretsmanager_secret.arho-db-r.arn
+          aws_secretsmanager_secret.arho-db-r.arn,
           aws_secretsmanager_secret.syke-xroad-client-secret.arn
         ]
       }
