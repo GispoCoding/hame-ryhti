@@ -55,7 +55,7 @@
 	"sops": {
 		"kms": [
 			{
-				"arn": "arn:aws:kms:eu-central-1:631260641272:alias/Arho-ryhti",
+				"arn": "arn:aws:kms:eu-central-1:631260641272:alias/Hame-ryhti",
 				"created_at": "2024-09-19T12:49:24Z",
 				"enc": "AQICAHiE41A2/p59xbFWiUt+oC17wSyQhQ4tvk+1zIy71M/m3QGpeJOI4WEtRtl7Pgs+M2oEAAAAfjB8BgkqhkiG9w0BBwagbzBtAgEAMGgGCSqGSIb3DQEHATAeBglghkgBZQMEAS4wEQQM/4RPIKGsKzA/GgYIAgEQgDtnZc1BGS+ALkWh7o45whP+YbvXEClgL5Hcc99OXW+JdXZryRgP8r+ADlnopHTHQiSZYpYMSCr2x54VmA==",
 				"aws_profile": ""
