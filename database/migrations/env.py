@@ -101,7 +101,7 @@ def include_object(object, name, type_, reflected, compare_to):
 # Check our schemas
 def include_name(name, type_, parent_names):
     if type_ in "schema":
-        return name in ["hame", "codes"]
+        return name in ["arho", "codes"]
     else:
         return True
 
@@ -118,7 +118,7 @@ def get_url(connection_params: dict):
         "host", os.environ.get("DB_INSTANCE_ADDRESS", "localhost")
     )
     port = connection_params.get("port", os.environ.get("DB_INSTANCE_PORT", "5434"))
-    dbname = connection_params.get("dbname", os.environ.get("DB_MAIN_NAME", "hame"))
+    dbname = connection_params.get("dbname", os.environ.get("DB_MAIN_NAME", "arho"))
     return f"postgresql://{user}:{password}@{host}:{port}/{dbname}"
 
 

@@ -13,7 +13,7 @@ from db_helper import DatabaseHelper, Db, User
 from psycopg2.sql import SQL, Identifier
 
 """
-Hame-ryhti database manager, adapted from Tarmo db_manager.
+Arho-ryhti database manager, adapted from Tarmo db_manager.
 """
 
 LOGGER = logging.getLogger()
@@ -51,10 +51,10 @@ def configure_schemas_and_users(
     conn: psycopg2.extensions.connection, users: dict[User, dict]
 ) -> str:
     """
-    Configures given database with hame schemas and users.
+    Configures given database with arho schemas and users.
     """
     with conn.cursor() as cur:
-        cur.execute(SQL("CREATE SCHEMA codes; CREATE SCHEMA hame;"))
+        cur.execute(SQL("CREATE SCHEMA codes; CREATE SCHEMA arho;"))
         cur.execute(SQL("CREATE EXTENSION postgis WITH SCHEMA public;"))
         for key, user in users.items():
             if key == User.SU:
@@ -78,7 +78,7 @@ def configure_schemas_and_users(
                     ).format(username=Identifier(user["username"])),
                     vars={"password": user["password"]},
                 )
-    msg = "Added hame schemas and users."
+    msg = "Added arho schemas and users."
     return msg
 
 
@@ -97,7 +97,7 @@ def configure_permissions(
                 pass
             if key == User.ADMIN:
                 # admin user should be able to edit all tables
-                # (hame and code tables etc.)
+                # (arho and code tables etc.)
                 cur.execute(
                     SQL(
                         "ALTER DEFAULT PRIVILEGES FOR USER {SU_user} GRANT ALL PRIVILEGES ON TABLES TO {username};"  # noqa
@@ -107,11 +107,11 @@ def configure_permissions(
                     )
                 )
             elif key == User.READ_WRITE:
-                # read and write user should be able to edit hame tables and
+                # read and write user should be able to edit arho tables and
                 # read code tables
                 cur.execute(
                     SQL(
-                        "ALTER DEFAULT PRIVILEGES FOR USER {SU_user} IN SCHEMA hame GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO {username};"  # noqa
+                        "ALTER DEFAULT PRIVILEGES FOR USER {SU_user} IN SCHEMA arho GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO {username};"  # noqa
                     ).format(
                         SU_user=Identifier(users[User.SU]["username"]),
                         username=Identifier(user["username"]),
@@ -126,10 +126,10 @@ def configure_permissions(
                     )
                 )
             else:
-                # default user should be able to read hame tables and code tables
+                # default user should be able to read arho tables and code tables
                 cur.execute(
                     SQL(
-                        "ALTER DEFAULT PRIVILEGES FOR USER {SU_user} IN SCHEMA hame, codes GRANT SELECT ON TABLES TO {username};"  # noqa
+                        "ALTER DEFAULT PRIVILEGES FOR USER {SU_user} IN SCHEMA arho, codes GRANT SELECT ON TABLES TO {username};"  # noqa
                     ).format(
                         SU_user=Identifier(users[User.SU]["username"]),
                         username=Identifier(user["username"]),
@@ -137,7 +137,7 @@ def configure_permissions(
                 )
             # Finally, all users must have schema usage permissions
             cur.execute(
-                SQL("GRANT USAGE ON SCHEMA hame to {username}").format(
+                SQL("GRANT USAGE ON SCHEMA arho to {username}").format(
                     username=Identifier(user["username"])
                 )
             )
@@ -157,7 +157,7 @@ def database_exists(conn: psycopg2.extensions.connection, db_name: str) -> bool:
         return cur.fetchone()[0] == 1
 
 
-def migrate_hame_db(db_helper: DatabaseHelper, version: str = "head") -> str:
+def migrate_arho_db(db_helper: DatabaseHelper, version: str = "head") -> str:
     """Migrates an existing db to the latest scheme, or provided version. Also
     configures database permissions.
 
@@ -260,14 +260,14 @@ def handler(event: Event, _) -> Response:
 
     event_type = event.get("event_type", EventType.CREATE_DB.value)
     if event_type == EventType.CREATE_DB.value:
-        msg = migrate_hame_db(db_helper)
+        msg = migrate_arho_db(db_helper)
     elif event_type == EventType.CHANGE_PWS.value:
         msg = change_passwords(db_helper)
     elif event_type == EventType.MIGRATE_DB.value:
         version = str(event.get("version", ""))
         if version:
-            msg = migrate_hame_db(db_helper, version)
+            msg = migrate_arho_db(db_helper, version)
         else:
-            msg = migrate_hame_db(db_helper)
+            msg = migrate_arho_db(db_helper)
     response["body"] = json.dumps(msg)
     return response

@@ -7,15 +7,15 @@
 | Name | Type | Default | Nullable | Children | Parents | Comment |
 | ---- | ---- | ------- | -------- | -------- | ------- | ------- |
 | value | varchar |  | false |  |  |  |
-| name | jsonb | '{"eng": "", "fin": "", "swe": ""}'::jsonb | false |  |  |  |
-| id | uuid | gen_random_uuid() | false | [codes.lifecycle_status](codes.lifecycle_status.md) [hame.plan](hame.plan.md) [hame.plan_regulation](hame.plan_regulation.md) [hame.plan_proposition](hame.plan_proposition.md) [hame.land_use_area](hame.land_use_area.md) [hame.land_use_point](hame.land_use_point.md) [hame.line](hame.line.md) [hame.other_area](hame.other_area.md) [hame.other_point](hame.other_point.md) [hame.lifecycle_date](hame.lifecycle_date.md) |  |  |
 | short_name | varchar | ''::character varying | false |  |  |  |
+| name | jsonb | '{"eng": "", "fin": "", "swe": ""}'::jsonb | false |  |  |  |
 | description | jsonb | '{"eng": "", "fin": "", "swe": ""}'::jsonb | false |  |  |  |
-| created_at | timestamp without time zone | now() | false |  |  |  |
-| modified_at | timestamp without time zone | now() | false |  |  |  |
+| status | varchar |  | false |  |  |  |
 | level | integer | 1 | false |  |  |  |
 | parent_id | uuid |  | true |  | [codes.lifecycle_status](codes.lifecycle_status.md) |  |
-| status | varchar |  | false |  |  |  |
+| id | uuid | gen_random_uuid() | false | [codes.lifecycle_status](codes.lifecycle_status.md) [arho.plan](arho.plan.md) [arho.plan_proposition](arho.plan_proposition.md) [arho.plan_regulation](arho.plan_regulation.md) [arho.land_use_area](arho.land_use_area.md) [arho.land_use_point](arho.land_use_point.md) [arho.line](arho.line.md) [arho.other_area](arho.other_area.md) [arho.other_point](arho.other_point.md) [arho.lifecycle_date](arho.lifecycle_date.md) |  |  |
+| created_at | timestamp without time zone | now() | false |  |  |  |
+| modified_at | timestamp without time zone | now() | false |  |  |  |
 
 ## Viewpoints
 
@@ -35,10 +35,10 @@
 | Name | Definition |
 | ---- | ---------- |
 | lifecycle_status_pkey | CREATE UNIQUE INDEX lifecycle_status_pkey ON codes.lifecycle_status USING btree (id) |
-| ix_codes_lifecycle_status_value | CREATE UNIQUE INDEX ix_codes_lifecycle_status_value ON codes.lifecycle_status USING btree (value) |
 | ix_codes_lifecycle_status_level | CREATE INDEX ix_codes_lifecycle_status_level ON codes.lifecycle_status USING btree (level) |
 | ix_codes_lifecycle_status_parent_id | CREATE INDEX ix_codes_lifecycle_status_parent_id ON codes.lifecycle_status USING btree (parent_id) |
 | ix_codes_lifecycle_status_short_name | CREATE INDEX ix_codes_lifecycle_status_short_name ON codes.lifecycle_status USING btree (short_name) |
+| ix_codes_lifecycle_status_value | CREATE UNIQUE INDEX ix_codes_lifecycle_status_value ON codes.lifecycle_status USING btree (value) |
 
 ## Relations
 

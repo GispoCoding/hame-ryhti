@@ -7,8 +7,8 @@ from alembic_utils.pg_trigger import PGTrigger
 from shapely.geometry import MultiPolygon
 from sqlalchemy.orm import Mapped
 
-# All hame tables
-hame_tables = [
+# All arho tables
+arho_tables = [
     klass.__tablename__
     for _, klass in inspect.getmembers(models, inspect.isclass)
     if inspect.getmodule(klass) == models  # Ignore imported classes
@@ -54,24 +54,24 @@ def generate_modified_at_triggers():
         """
 
     trgfunc = PGFunction(
-        schema="hame",
+        schema="arho",
         signature=trgfunc_signature,
         definition=trgfunc_definition,
     )
 
     trgs = []
-    for table in hame_tables:
+    for table in arho_tables:
         trg_signature = f"trg_{table}_modified_at"
         trg_definition = f"""
         BEFORE INSERT OR UPDATE ON {table}
         FOR EACH ROW
-        EXECUTE FUNCTION hame.{trgfunc_signature}
+        EXECUTE FUNCTION arho.{trgfunc_signature}
         """
 
         trg = PGTrigger(
-            schema="hame",
+            schema="arho",
             signature=trg_signature,
-            on_entity=f"hame.{table}",
+            on_entity=f"arho.{table}",
             is_constraint=False,
             definition=trg_definition,
         )
@@ -88,12 +88,12 @@ def generate_new_lifecycle_date_triggers():
         trgfunc_definition = f"""
         RETURNS TRIGGER AS $$
         BEGIN
-            INSERT INTO hame.lifecycle_date
+            INSERT INTO arho.lifecycle_date
                 (lifecycle_status_id, {table}_id, starting_at)
             VALUES
                 (NEW.lifecycle_status_id, NEW.id, CURRENT_TIMESTAMP);
 
-            UPDATE hame.lifecycle_date
+            UPDATE arho.lifecycle_date
             SET ending_at=CURRENT_TIMESTAMP
             WHERE {table}_id=NEW.id
                 AND ending_at IS NULL
@@ -108,20 +108,20 @@ def generate_new_lifecycle_date_triggers():
         BEFORE UPDATE ON {table}
         FOR EACH ROW
         WHEN (NEW.lifecycle_status_id <> OLD.lifecycle_status_id)
-        EXECUTE FUNCTION hame.{trgfunc_signature}
+        EXECUTE FUNCTION arho.{trgfunc_signature}
         """
 
         trgfunc = PGFunction(
-            schema="hame",
+            schema="arho",
             signature=trgfunc_signature,
             definition=trgfunc_definition,
         )
         trgfuncs.append(trgfunc)
 
         trg = PGTrigger(
-            schema="hame",
+            schema="arho",
             signature=trg_signature,
-            on_entity=f"hame.{table}",
+            on_entity=f"arho.{table}",
             is_constraint=False,
             definition=trg_definition,
         )
@@ -138,7 +138,7 @@ def generate_update_lifecycle_status_triggers():
         trgfunc_definition = f"""
         RETURNS TRIGGER AS $$
         BEGIN
-            UPDATE hame.{object_table}
+            UPDATE arho.{object_table}
             SET lifecycle_status_id = NEW.lifecycle_status_id
             WHERE (plan_id = NEW.id
             AND lifecycle_status_id = OLD.lifecycle_status_id);
@@ -152,18 +152,18 @@ def generate_update_lifecycle_status_triggers():
         BEFORE UPDATE ON plan
         FOR EACH ROW
         WHEN (NEW.lifecycle_status_id <> OLD.lifecycle_status_id)
-        EXECUTE FUNCTION hame.{trgfunc_signature}
+        EXECUTE FUNCTION arho.{trgfunc_signature}
         """
 
         trgfunc = PGFunction(
-            schema="hame", signature=trgfunc_signature, definition=trgfunc_definition
+            schema="arho", signature=trgfunc_signature, definition=trgfunc_definition
         )
         trgfuncs.append(trgfunc)
 
         trg = PGTrigger(
-            schema="hame",
+            schema="arho",
             signature=trg_signature,
-            on_entity="hame.plan",
+            on_entity="arho.plan",
             is_constraint=False,
             definition=trg_definition,
         )
@@ -179,7 +179,7 @@ def generate_update_lifecycle_status_triggers():
             trgfunc_definition = f"""
             RETURNS TRIGGER AS $$
             BEGIN
-                UPDATE hame.{regulation_table}
+                UPDATE arho.{regulation_table}
                 SET lifecycle_status_id = NEW.lifecycle_status_id
                 WHERE (plan_regulation_group_id = NEW.plan_regulation_group_id
                 AND lifecycle_status_id = OLD.lifecycle_status_id);
@@ -192,23 +192,23 @@ def generate_update_lifecycle_status_triggers():
                 f"trg_{object_table}_{regulation_table}_update_lifecycle_status"
             )
             trg_definition = f"""
-            BEFORE UPDATE ON hame.{object_table}
+            BEFORE UPDATE ON arho.{object_table}
             FOR EACH ROW
             WHEN (NEW.lifecycle_status_id <> OLD.lifecycle_status_id)
-            EXECUTE FUNCTION hame.{trgfunc_signature}
+            EXECUTE FUNCTION arho.{trgfunc_signature}
             """
 
             trgfunc = PGFunction(
-                schema="hame",
+                schema="arho",
                 signature=trgfunc_signature,
                 definition=trgfunc_definition,
             )
             trgfuncs.append(trgfunc)
 
             trg = PGTrigger(
-                schema="hame",
+                schema="arho",
                 signature=trg_signature,
-                on_entity=f"hame.{object_table}",
+                on_entity=f"arho.{object_table}",
                 is_constraint=False,
                 definition=trg_definition,
             )
@@ -220,7 +220,7 @@ def generate_update_lifecycle_status_triggers():
         trgfunc_definition = f"""
         RETURNS TRIGGER AS $$
         BEGIN
-            UPDATE hame.{regulation_table}
+            UPDATE arho.{regulation_table}
             SET lifecycle_status_id = NEW.lifecycle_status_id
             WHERE (plan_regulation_group_id = NEW.plan_regulation_group_id
             AND lifecycle_status_id = OLD.lifecycle_status_id);
@@ -231,23 +231,23 @@ def generate_update_lifecycle_status_triggers():
 
         trg_signature = f"trg_plan_{regulation_table}_update_lifecycle_status"
         trg_definition = f"""
-        BEFORE UPDATE ON hame.plan
+        BEFORE UPDATE ON arho.plan
         FOR EACH ROW
         WHEN (NEW.lifecycle_status_id <> OLD.lifecycle_status_id)
-        EXECUTE FUNCTION hame.{trgfunc_signature}
+        EXECUTE FUNCTION arho.{trgfunc_signature}
         """
 
         trgfunc = PGFunction(
-            schema="hame",
+            schema="arho",
             signature=trgfunc_signature,
             definition=trgfunc_definition,
         )
         trgfuncs.append(trgfunc)
 
         trg = PGTrigger(
-            schema="hame",
+            schema="arho",
             signature=trg_signature,
-            on_entity="hame.plan",
+            on_entity="arho.plan",
             is_constraint=False,
             definition=trg_definition,
         )
@@ -265,7 +265,7 @@ def generate_new_lifecycle_status_triggers():
         RETURNS TRIGGER AS $$
         BEGIN
             NEW.lifecycle_status_id = (
-                SELECT lifecycle_status_id FROM hame.plan WHERE plan.id = NEW.plan_id
+                SELECT lifecycle_status_id FROM arho.plan WHERE plan.id = NEW.plan_id
             );
             RETURN NEW;
         END;
@@ -277,18 +277,18 @@ def generate_new_lifecycle_status_triggers():
         BEFORE INSERT ON {object_table}
         FOR EACH ROW
         WHEN (NEW.plan_id IS NOT NULL)
-        EXECUTE FUNCTION hame.{trgfunc_signature}
+        EXECUTE FUNCTION arho.{trgfunc_signature}
         """
 
         trgfunc = PGFunction(
-            schema="hame", signature=trgfunc_signature, definition=trgfunc_definition
+            schema="arho", signature=trgfunc_signature, definition=trgfunc_definition
         )
         trgfuncs.append(trgfunc)
 
         trg = PGTrigger(
-            schema="hame",
+            schema="arho",
             signature=trg_signature,
-            on_entity=f"hame.{object_table}",
+            on_entity=f"arho.{object_table}",
             is_constraint=False,
             definition=trg_definition,
         )
@@ -309,7 +309,7 @@ def generate_new_lifecycle_status_triggers():
             RETURNS TRIGGER AS $$
             DECLARE status_id UUID := (
                 SELECT lifecycle_status_id
-                FROM hame.{object_table}
+                FROM arho.{object_table}
                 WHERE plan_regulation_group_id = NEW.plan_regulation_group_id
                 LIMIT 1
                 );
@@ -326,13 +326,13 @@ def generate_new_lifecycle_status_triggers():
                 f"trg_{regulation_table}_{object_table}_new_lifecycle_status"
             )
             trg_definition = f"""
-            BEFORE INSERT ON hame.{regulation_table}
+            BEFORE INSERT ON arho.{regulation_table}
             FOR EACH ROW
-            EXECUTE FUNCTION hame.{trgfunc_signature}
+            EXECUTE FUNCTION arho.{trgfunc_signature}
             """
 
             trgfunc = PGFunction(
-                schema="hame",
+                schema="arho",
                 signature=trgfunc_signature,
                 definition=trgfunc_definition,
             )
@@ -341,9 +341,9 @@ def generate_new_lifecycle_status_triggers():
             # assert False
 
             trg = PGTrigger(
-                schema="hame",
+                schema="arho",
                 signature=trg_signature,
-                on_entity=f"hame.{regulation_table}",
+                on_entity=f"arho.{regulation_table}",
                 is_constraint=False,
                 definition=trg_definition,
             )
@@ -360,7 +360,7 @@ def generate_new_lifecycle_status_triggers():
         RETURNS TRIGGER AS $$
         DECLARE status_id UUID := (
             SELECT lifecycle_status_id
-            FROM hame.plan
+            FROM arho.plan
             WHERE plan_regulation_group_id = NEW.plan_regulation_group_id
             LIMIT 1
             );
@@ -375,20 +375,20 @@ def generate_new_lifecycle_status_triggers():
 
         trg_signature = f"trg_{regulation_table}_plan_new_lifecycle_status"
         trg_definition = f"""
-            BEFORE INSERT ON hame.{regulation_table}
+            BEFORE INSERT ON arho.{regulation_table}
             FOR EACH ROW
-            EXECUTE FUNCTION hame.{trgfunc_signature}
+            EXECUTE FUNCTION arho.{trgfunc_signature}
         """
 
         trgfunc = PGFunction(
-            schema="hame", signature=trgfunc_signature, definition=trgfunc_definition
+            schema="arho", signature=trgfunc_signature, definition=trgfunc_definition
         )
         trgfuncs.append(trgfunc)
 
         trg = PGTrigger(
-            schema="hame",
+            schema="arho",
             signature=trg_signature,
-            on_entity=f"hame.{regulation_table}",
+            on_entity=f"arho.{regulation_table}",
             is_constraint=False,
             definition=trg_definition,
         )
@@ -405,7 +405,7 @@ def generate_add_plan_id_fkey_triggers():
         -- Get the most recent plan whose geometry contains the plan object
         NEW.plan_id := (
             SELECT id
-            FROM hame.plan
+            FROM arho.plan
             WHERE ST_Contains(geom, NEW.geom)
             ORDER BY created_at DESC
             LIMIT 1
@@ -415,7 +415,7 @@ def generate_add_plan_id_fkey_triggers():
     $$ language 'plpgsql'
     """
     trgfunc = PGFunction(
-        schema="hame", signature=trgfunc_signature, definition=trgfunc_definition
+        schema="arho", signature=trgfunc_signature, definition=trgfunc_definition
     )
 
     trgs = []
@@ -424,13 +424,13 @@ def generate_add_plan_id_fkey_triggers():
         trg_definition = f"""
         BEFORE INSERT ON {table}
         FOR EACH ROW
-        EXECUTE FUNCTION hame.{trgfunc_signature}
+        EXECUTE FUNCTION arho.{trgfunc_signature}
         """
 
         trg = PGTrigger(
-            schema="hame",
+            schema="arho",
             signature=trg_signature,
-            on_entity=f"hame.{table}",
+            on_entity=f"arho.{table}",
             is_constraint=False,
             definition=trg_definition,
         )
@@ -452,7 +452,7 @@ def generate_validate_polygon_geometry_triggers():
     $$ language 'plpgsql'
     """
     trgfunc = PGFunction(
-        schema="hame", signature=trgfunc_signature, definition=trgfunc_definition
+        schema="arho", signature=trgfunc_signature, definition=trgfunc_definition
     )
 
     trgs = []
@@ -461,13 +461,13 @@ def generate_validate_polygon_geometry_triggers():
         trg_definition = f"""
         BEFORE INSERT OR UPDATE ON {table}
         FOR EACH ROW
-        EXECUTE FUNCTION hame.{trgfunc_signature}
+        EXECUTE FUNCTION arho.{trgfunc_signature}
         """
 
         trg = PGTrigger(
-            schema="hame",
+            schema="arho",
             signature=trg_signature,
-            on_entity=f"hame.{table}",
+            on_entity=f"arho.{table}",
             is_constraint=False,
             definition=trg_definition,
         )
@@ -477,7 +477,7 @@ def generate_validate_polygon_geometry_triggers():
 
 
 trgfunc_validate_line_geometry = PGFunction(
-    schema="hame",
+    schema="arho",
     signature="trgfunc_line_validate_geometry()",
     definition="""
     RETURNS TRIGGER AS $$
@@ -492,19 +492,19 @@ trgfunc_validate_line_geometry = PGFunction(
 )
 
 trg_validate_line_geometry = PGTrigger(
-    schema="hame",
+    schema="arho",
     signature="trg_line_validate_geometry",
-    on_entity="hame.line",
+    on_entity="arho.line",
     is_constraint=False,
     definition="""
     BEFORE INSERT OR UPDATE ON line
     FOR EACH ROW
-    EXECUTE FUNCTION hame.trgfunc_line_validate_geometry()""",
+    EXECUTE FUNCTION arho.trgfunc_line_validate_geometry()""",
 )
 
 
 trgfunc_add_intersecting_other_area_geometries = PGFunction(
-    schema="hame",
+    schema="arho",
     signature="trgfunc_other_area_insert_intersecting_geometries()",
     definition="""
     RETURNS TRIGGER AS $$
@@ -514,8 +514,8 @@ trgfunc_add_intersecting_other_area_geometries = PGFunction(
         -- that equals to 'paakayttotarkoitus'
         IF EXISTS (
             SELECT 1
-            FROM hame.plan_regulation_group prg
-            JOIN hame.plan_regulation pr ON pr.plan_regulation_group_id = prg.id
+            FROM arho.plan_regulation_group prg
+            JOIN arho.plan_regulation pr ON pr.plan_regulation_group_id = prg.id
             JOIN codes.type_of_additional_information tai ON tai.id = pr.intended_use_id
             WHERE tai.value = 'paakayttotarkoitus'
             AND prg.id = NEW.plan_regulation_group_id
@@ -524,7 +524,7 @@ trgfunc_add_intersecting_other_area_geometries = PGFunction(
             -- plan_regulation_group that the new geometry intersects
             IF EXISTS (
                 SELECT 1
-                FROM hame.other_area oa
+                FROM arho.other_area oa
                 WHERE oa.plan_regulation_group_id = NEW.plan_regulation_group_id
                 AND ST_Intersects(oa.geom, NEW.geom)
             ) THEN
@@ -540,12 +540,12 @@ trgfunc_add_intersecting_other_area_geometries = PGFunction(
 )
 
 trg_add_intersecting_other_area_geometries = PGTrigger(
-    schema="hame",
+    schema="arho",
     signature="trg_other_area_insert_intersecting_geometries",
-    on_entity="hame.other_area",
+    on_entity="arho.other_area",
     is_constraint=False,
     definition="""
     BEFORE INSERT ON other_area
     FOR EACH ROW
-    EXECUTE FUNCTION hame.trgfunc_other_area_insert_intersecting_geometries()""",
+    EXECUTE FUNCTION arho.trgfunc_other_area_insert_intersecting_geometries()""",
 )

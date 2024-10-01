@@ -26,14 +26,14 @@ class Plan(PlanBase):
     __tablename__ = "plan"
 
     organisation_id: Mapped[uuid.UUID] = mapped_column(
-        ForeignKey("hame.organisation.id", name="organisation_id_fkey")
+        ForeignKey("arho.organisation.id", name="organisation_id_fkey")
     )
     organisation: Mapped["Organisation"] = relationship(
         "Organisation", backref="plans", lazy="joined"
     )
     plan_regulation_group_id: Mapped[Optional[uuid.UUID]] = mapped_column(
         ForeignKey(
-            "hame.plan_regulation_group.id", name="plan_regulation_group_id_fkey"
+            "arho.plan_regulation_group.id", name="plan_regulation_group_id_fkey"
         )
     )
     # Let's do lazy loading for all general plan regulations.
@@ -163,7 +163,7 @@ class PlanRegulation(PlanBase):
 
     plan_regulation_group_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey(
-            "hame.plan_regulation_group.id", name="plan_regulation_group_id_fkey"
+            "arho.plan_regulation_group.id", name="plan_regulation_group_id_fkey"
         )
     )
 
@@ -326,7 +326,7 @@ class PlanProposition(PlanBase):
 
     plan_regulation_group_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey(
-            "hame.plan_regulation_group.id", name="plan_regulation_group_id_fkey"
+            "arho.plan_regulation_group.id", name="plan_regulation_group_id_fkey"
         )
     )
     plan_theme_id: Mapped[Optional[uuid.UUID]] = mapped_column(
@@ -353,7 +353,7 @@ class SourceData(VersionedBase):
         ForeignKey("codes.type_of_source_data.id", name="type_of_source_data_id_fkey")
     )
     plan_id: Mapped[uuid.UUID] = mapped_column(
-        ForeignKey("hame.plan.id", name="plan_id_fkey")
+        ForeignKey("arho.plan.id", name="plan_id_fkey")
     )
 
     # Let's load all the codes for objects joined.
@@ -397,7 +397,7 @@ class Document(VersionedBase):
         ForeignKey("codes.type_of_document.id", name="type_of_document_id_fkey")
     )
     plan_id: Mapped[uuid.UUID] = mapped_column(
-        ForeignKey("hame.plan.id", name="plan_id_fkey")
+        ForeignKey("arho.plan.id", name="plan_id_fkey")
     )
     category_of_publicity_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey(
@@ -434,28 +434,28 @@ class LifeCycleDate(VersionedBase):
         index=True,
     )
     plan_id: Mapped[Optional[uuid.UUID]] = mapped_column(
-        ForeignKey("hame.plan.id", name="plan_id_fkey")
+        ForeignKey("arho.plan.id", name="plan_id_fkey")
     )
     land_use_area_id: Mapped[Optional[uuid.UUID]] = mapped_column(
-        ForeignKey("hame.land_use_area.id", name="land_use_area_id_fkey")
+        ForeignKey("arho.land_use_area.id", name="land_use_area_id_fkey")
     )
     other_area_id: Mapped[Optional[uuid.UUID]] = mapped_column(
-        ForeignKey("hame.other_area.id", name="other_area_id_fkey")
+        ForeignKey("arho.other_area.id", name="other_area_id_fkey")
     )
     line_id: Mapped[Optional[uuid.UUID]] = mapped_column(
-        ForeignKey("hame.line.id", name="line_id_fkey")
+        ForeignKey("arho.line.id", name="line_id_fkey")
     )
     land_use_point_id: Mapped[Optional[uuid.UUID]] = mapped_column(
-        ForeignKey("hame.land_use_point.id", name="land_use_point_id_fkey")
+        ForeignKey("arho.land_use_point.id", name="land_use_point_id_fkey")
     )
     other_point_id: Mapped[Optional[uuid.UUID]] = mapped_column(
-        ForeignKey("hame.other_point.id", name="other_point_id_fkey")
+        ForeignKey("arho.other_point.id", name="other_point_id_fkey")
     )
     plan_regulation_id: Mapped[Optional[uuid.UUID]] = mapped_column(
-        ForeignKey("hame.plan_regulation.id", name="plan_regulation_id_fkey")
+        ForeignKey("arho.plan_regulation.id", name="plan_regulation_id_fkey")
     )
     plan_proposition_id: Mapped[Optional[uuid.UUID]] = mapped_column(
-        ForeignKey("hame.plan_proposition.id", name="plan_proposition_id_fkey")
+        ForeignKey("arho.plan_proposition.id", name="plan_proposition_id_fkey")
     )
 
     plan: Mapped[Optional["Plan"]] = relationship(back_populates="lifecycle_dates")

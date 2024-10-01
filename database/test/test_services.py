@@ -8,7 +8,7 @@ import requests
 from koodistot_loader.koodistot_loader import codes
 from sqlalchemy.orm import Session
 
-from .conftest import assert_database_is_alright, drop_hame_db
+from .conftest import assert_database_is_alright, drop_arho_db
 
 
 @pytest.fixture()
@@ -45,7 +45,7 @@ def create_db(db_manager_url, main_db_params, root_db_params):
     assert data["statusCode"] == 200, data["body"]
     yield
 
-    drop_hame_db(main_db_params, root_db_params)
+    drop_arho_db(main_db_params, root_db_params)
 
 
 @pytest.fixture()
@@ -235,7 +235,7 @@ def test_validate_invalid_plan(validate_invalid_plan, main_db_params):
     conn = psycopg2.connect(**main_db_params)
     try:
         with conn.cursor() as cur:
-            cur.execute(f"SELECT validated_at, validation_errors FROM hame.plan")
+            cur.execute(f"SELECT validated_at, validation_errors FROM arho.plan")
             validation_date, errors = cur.fetchone()
             assert validation_date
             assert errors
@@ -409,7 +409,7 @@ def test_validate_valid_plan_matter_in_preparation(
     try:
         with conn.cursor() as cur:
             cur.execute(
-                f"SELECT validated_at, validation_errors, permanent_plan_identifier FROM hame.plan"
+                f"SELECT validated_at, validation_errors, permanent_plan_identifier FROM arho.plan"
             )
             validation_date, errors, permanent_plan_identifier = cur.fetchone()
             assert validation_date

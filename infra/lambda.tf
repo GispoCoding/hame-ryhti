@@ -14,13 +14,13 @@ resource "aws_lambda_function" "db_manager" {
     variables = {
       AWS_REGION_NAME     = var.AWS_REGION_NAME
       DB_INSTANCE_ADDRESS = aws_db_instance.main_db.address
-      DB_MAIN_NAME        = var.hame_db_name
+      DB_MAIN_NAME        = var.arho_db_name
       DB_MAINTENANCE_NAME = "postgres"
       READ_FROM_AWS       = 1
-      DB_SECRET_SU_ARN    = aws_secretsmanager_secret.hame-db-su.arn
-      DB_SECRET_ADMIN_ARN = aws_secretsmanager_secret.hame-db-admin.arn
-      DB_SECRET_R_ARN     = aws_secretsmanager_secret.hame-db-r.arn
-      DB_SECRET_RW_ARN    = aws_secretsmanager_secret.hame-db-rw.arn
+      DB_SECRET_SU_ARN    = aws_secretsmanager_secret.arho-db-su.arn
+      DB_SECRET_ADMIN_ARN = aws_secretsmanager_secret.arho-db-admin.arn
+      DB_SECRET_R_ARN     = aws_secretsmanager_secret.arho-db-r.arn
+      DB_SECRET_RW_ARN    = aws_secretsmanager_secret.arho-db-rw.arn
     }
   }
   tags = merge(local.default_tags, { Name = "${var.prefix}-db_manager" })
@@ -53,10 +53,10 @@ resource "aws_lambda_function" "koodistot_loader" {
     variables = {
       AWS_REGION_NAME     = var.AWS_REGION_NAME
       DB_INSTANCE_ADDRESS = aws_db_instance.main_db.address
-      DB_MAIN_NAME        = var.hame_db_name
+      DB_MAIN_NAME        = var.arho_db_name
       DB_MAINTENANCE_NAME = "postgres"
       READ_FROM_AWS       = 1
-      DB_SECRET_ADMIN_ARN = aws_secretsmanager_secret.hame-db-admin.arn
+      DB_SECRET_ADMIN_ARN = aws_secretsmanager_secret.arho-db-admin.arn
     }
   }
   tags = merge(local.default_tags, { Name = "${var.prefix}-koodistot_loader" })
@@ -97,10 +97,10 @@ resource "aws_lambda_function" "ryhti_client" {
     variables = {
       AWS_REGION_NAME     = var.AWS_REGION_NAME
       DB_INSTANCE_ADDRESS = aws_db_instance.main_db.address
-      DB_MAIN_NAME        = var.hame_db_name
+      DB_MAIN_NAME        = var.arho_db_name
       DB_MAINTENANCE_NAME = "postgres"
       READ_FROM_AWS       = 1
-      DB_SECRET_RW_ARN    = aws_secretsmanager_secret.hame-db-rw.arn
+      DB_SECRET_RW_ARN    = aws_secretsmanager_secret.arho-db-rw.arn
       SYKE_APIKEY         = var.syke_apikey
       XROAD_SERVER_ADDRESS = local.xroad_dns_record
       XROAD_INSTANCE = var.x-road_instance
@@ -148,10 +148,10 @@ resource "aws_lambda_function" "mml_loader" {
     variables = {
       AWS_REGION_NAME     = var.AWS_REGION_NAME
       DB_INSTANCE_ADDRESS = aws_db_instance.main_db.address
-      DB_MAIN_NAME        = var.hame_db_name
+      DB_MAIN_NAME        = var.arho_db_name
       DB_MAINTENANCE_NAME = "postgres"
       READ_FROM_AWS       = 1
-      DB_SECRET_RW_ARN    = aws_secretsmanager_secret.hame-db-rw.arn
+      DB_SECRET_RW_ARN    = aws_secretsmanager_secret.arho-db-rw.arn
       MML_APIKEY          = var.mml_apikey
     }
   }

@@ -13,7 +13,7 @@
 | status | varchar |  | false |  |  |  |
 | level | integer | 1 | false |  |  |  |
 | parent_id | uuid |  | true |  | [codes.type_of_source_data](codes.type_of_source_data.md) |  |
-| id | uuid | gen_random_uuid() | false | [codes.type_of_source_data](codes.type_of_source_data.md) [hame.source_data](hame.source_data.md) |  |  |
+| id | uuid | gen_random_uuid() | false | [codes.type_of_source_data](codes.type_of_source_data.md) [arho.source_data](arho.source_data.md) |  |  |
 | created_at | timestamp without time zone | now() | false |  |  |  |
 | modified_at | timestamp without time zone | now() | false |  |  |  |
 
@@ -37,8 +37,8 @@
 | type_of_source_data_pkey | CREATE UNIQUE INDEX type_of_source_data_pkey ON codes.type_of_source_data USING btree (id) |
 | ix_codes_type_of_source_data_level | CREATE INDEX ix_codes_type_of_source_data_level ON codes.type_of_source_data USING btree (level) |
 | ix_codes_type_of_source_data_parent_id | CREATE INDEX ix_codes_type_of_source_data_parent_id ON codes.type_of_source_data USING btree (parent_id) |
-| ix_codes_type_of_source_data_value | CREATE UNIQUE INDEX ix_codes_type_of_source_data_value ON codes.type_of_source_data USING btree (value) |
 | ix_codes_type_of_source_data_short_name | CREATE INDEX ix_codes_type_of_source_data_short_name ON codes.type_of_source_data USING btree (short_name) |
+| ix_codes_type_of_source_data_value | CREATE UNIQUE INDEX ix_codes_type_of_source_data_value ON codes.type_of_source_data USING btree (value) |
 
 ## Relations
 

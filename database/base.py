@@ -56,7 +56,7 @@ class VersionedBase(Base):
     """
 
     __abstract__ = True
-    __table_args__ = {"schema": "hame"}
+    __table_args__ = {"schema": "arho"}
 
     # Go figure. We have to *explicitly state* id is a mapped column, because id will
     # have to be defined inside all the subclasses for relationship remote_side
@@ -162,11 +162,11 @@ class PlanObjectBase(PlanBase):
         index=True,
     )
     plan_id: Mapped[Optional[uuid.UUID]] = mapped_column(
-        ForeignKey("hame.plan.id", name="plan_id_fkey"), index=True
+        ForeignKey("arho.plan.id", name="plan_id_fkey"), index=True
     )
     plan_regulation_group_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey(
-            "hame.plan_regulation_group.id", name="plan_regulation_group_id_fkey"
+            "arho.plan_regulation_group.id", name="plan_regulation_group_id_fkey"
         ),
         index=True,
     )

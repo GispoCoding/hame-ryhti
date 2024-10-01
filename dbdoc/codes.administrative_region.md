@@ -6,6 +6,7 @@
 
 | Name | Type | Default | Nullable | Children | Parents | Comment |
 | ---- | ---- | ------- | -------- | -------- | ------- | ------- |
+| geom | geometry(MultiPolygon,3067) |  | true |  |  |  |
 | value | varchar |  | false |  |  |  |
 | short_name | varchar | ''::character varying | false |  |  |  |
 | name | jsonb | '{"eng": "", "fin": "", "swe": ""}'::jsonb | false |  |  |  |
@@ -13,7 +14,7 @@
 | status | varchar |  | false |  |  |  |
 | level | integer | 1 | false |  |  |  |
 | parent_id | uuid |  | true |  | [codes.administrative_region](codes.administrative_region.md) |  |
-| id | uuid | gen_random_uuid() | false | [hame.organisation](hame.organisation.md) [codes.administrative_region](codes.administrative_region.md) |  |  |
+| id | uuid | gen_random_uuid() | false | [codes.administrative_region](codes.administrative_region.md) [arho.organisation](arho.organisation.md) |  |  |
 | created_at | timestamp without time zone | now() | false |  |  |  |
 | modified_at | timestamp without time zone | now() | false |  |  |  |
 
@@ -35,6 +36,7 @@
 | Name | Definition |
 | ---- | ---------- |
 | administrative_region_pkey | CREATE UNIQUE INDEX administrative_region_pkey ON codes.administrative_region USING btree (id) |
+| idx_administrative_region_geom | CREATE INDEX idx_administrative_region_geom ON codes.administrative_region USING gist (geom) |
 | ix_codes_administrative_region_level | CREATE INDEX ix_codes_administrative_region_level ON codes.administrative_region USING btree (level) |
 | ix_codes_administrative_region_parent_id | CREATE INDEX ix_codes_administrative_region_parent_id ON codes.administrative_region USING btree (parent_id) |
 | ix_codes_administrative_region_short_name | CREATE INDEX ix_codes_administrative_region_short_name ON codes.administrative_region USING btree (short_name) |
