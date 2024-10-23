@@ -2,8 +2,12 @@ import uuid
 from datetime import datetime
 from typing import List, Optional
 
+from shapely.geometry import MultiLineString, MultiPoint, MultiPolygon
+from sqlalchemy import ForeignKey
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
 # we have to import CodeBase in codes.py from here to allow two-way relationships
-from base import (  # noqa
+from database.base import (  # noqa
     CodeBase,
     PlanBase,
     PlanObjectBase,
@@ -13,9 +17,6 @@ from base import (  # noqa
     timestamp,
     unique_str,
 )
-from shapely.geometry import MultiLineString, MultiPoint, MultiPolygon
-from sqlalchemy import ForeignKey
-from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 
 class Plan(PlanBase):

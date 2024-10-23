@@ -1,11 +1,12 @@
 import inspect
 from typing import get_type_hints
 
-import models
 from alembic_utils.pg_function import PGFunction
 from alembic_utils.pg_trigger import PGTrigger
 from shapely.geometry import MultiPolygon
 from sqlalchemy.orm import Mapped
+
+from database import models
 
 # All hame tables
 hame_tables = [

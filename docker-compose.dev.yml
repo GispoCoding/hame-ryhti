@@ -12,7 +12,7 @@ services:
   db_manager:
     build:
       context: .
-      dockerfile: database/db_manager.Dockerfile
+      dockerfile: lambdas/db_manager/db_manager.Dockerfile
     env_file:
       - .env
     environment:
@@ -23,13 +23,11 @@ services:
       - "8081:8080"
     depends_on:
       - db
-    volumes:
-      - ./database/db_manager/db_manager.py:/var/task/app.py
 
   koodistot_loader:
     build:
       context: .
-      dockerfile: database/koodistot_loader.Dockerfile
+      dockerfile: lambdas/koodistot_loader/koodistot_loader.Dockerfile
     env_file:
       - .env
     environment:
@@ -40,13 +38,11 @@ services:
       - "8082:8080"
     depends_on:
       - db
-    volumes:
-      - ./database/koodistot_loader/koodistot_loader.py:/var/task/app.py
 
   ryhti_client:
     build:
       context: .
-      dockerfile: database/ryhti_client.Dockerfile
+      dockerfile: lambdas/ryhti_client/ryhti_client.Dockerfile
     env_file:
       - .env
     environment:
@@ -67,13 +63,12 @@ services:
       - db
       - mock_xroad
     volumes:
-      - ./database/ryhti_client/ryhti_client.py:/var/task/app.py
-      - ./database/ryhti_debug:/var/task/ryhti_debug
+      - ./lambdas/ryhti_debug:/var/task/ryhti_debug
 
   mml_loader:
     build:
       context: .
-      dockerfile: database/mml_loader.Dockerfile
+      dockerfile: lambdas/mml_loader/mml_loader.Dockerfile
     env_file:
       - .env
     environment:
@@ -85,8 +80,6 @@ services:
       - "8085:8080"
     depends_on:
       - db
-    volumes:
-      - ./database/mml_loader/mml_loader.py:/var/task/app.py
 
   mock_xroad:
       image: mockserver/mockserver:latest

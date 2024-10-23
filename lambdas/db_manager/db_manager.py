@@ -9,8 +9,9 @@ from alembic import command
 from alembic.config import Config
 from alembic.script import ScriptDirectory
 from alembic.util.exc import CommandError
-from db_helper import DatabaseHelper, Db, User
 from psycopg2.sql import SQL, Identifier
+
+from database.db_helper import DatabaseHelper, Db, User
 
 """
 Hame-ryhti database manager, adapted from Tarmo db_manager.
@@ -18,7 +19,6 @@ Hame-ryhti database manager, adapted from Tarmo db_manager.
 
 LOGGER = logging.getLogger()
 LOGGER.setLevel(logging.INFO)
-
 
 class EventType(enum.Enum):
     CREATE_DB = 1
