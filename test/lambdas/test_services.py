@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 from database import models
 from lambdas.koodistot_loader.koodistot_loader import codes
 
-from .conftest import assert_database_is_alright, drop_hame_db
+from ..conftest import assert_database_is_alright, drop_hame_db
 
 
 @pytest.fixture()
