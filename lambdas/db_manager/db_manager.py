@@ -20,6 +20,7 @@ Hame-ryhti database manager, adapted from Tarmo db_manager.
 LOGGER = logging.getLogger()
 LOGGER.setLevel(logging.INFO)
 
+
 class EventType(enum.Enum):
     CREATE_DB = 1
     CHANGE_PWS = 2
