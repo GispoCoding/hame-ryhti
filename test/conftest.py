@@ -5,8 +5,6 @@ from datetime import datetime
 from pathlib import Path
 from typing import Iterable
 
-import codes
-import models
 import psycopg2
 import pytest
 import sqlalchemy
@@ -14,14 +12,16 @@ from alembic import command
 from alembic.config import Config
 from alembic.operations import ops
 from alembic.script import ScriptDirectory
-from base import PROJECT_SRID
-from db_helper import DatabaseHelper
-from db_manager import db_manager
 from dotenv import load_dotenv
 from geoalchemy2.shape import from_shape
 from shapely.geometry import MultiLineString, MultiPoint, shape
 from sqlalchemy.dialects.postgresql import Range
 from sqlalchemy.orm import Session, sessionmaker
+
+from database import codes, models
+from database.base import PROJECT_SRID
+from database.db_helper import DatabaseHelper
+from lambdas.db_manager import db_manager
 
 hame_count: int = 13  # adjust me when adding tables
 codes_count: int = 16  # adjust me when adding tables
@@ -35,10 +35,9 @@ SCHEMA_FILES_PATH = Path(".")
 
 @pytest.fixture(scope="session", autouse=True)
 def set_env():
-    dotenv_file = Path(__file__).parent.parent.parent / ".env"
+    dotenv_file = Path(__file__).parent.parent / ".env"
     assert dotenv_file.exists()
     load_dotenv(str(dotenv_file))
-    db_manager.SCHEMA_FILES_PATH = str(Path(__file__).parent.parent)
 
 
 @pytest.fixture(scope="session")
@@ -76,7 +75,7 @@ def main_db_params_with_root_user():
 
 @pytest.fixture(scope="session")
 def docker_compose_file(pytestconfig):
-    compose_file = Path(__file__).parent.parent.parent / "docker-compose.dev.yml"
+    compose_file = Path(__file__).parent.parent / "docker-compose.dev.yml"
     assert compose_file.exists()
     return str(compose_file)
 

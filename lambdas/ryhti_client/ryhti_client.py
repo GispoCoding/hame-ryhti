@@ -5,12 +5,17 @@ import os
 from typing import Any, Dict, List, Optional, TypedDict
 from uuid import uuid4
 
-import base
 import boto3
-import models
 import requests
 import simplejson as json  # type: ignore
-from codes import (
+from geoalchemy2 import Geometry
+from geoalchemy2.shape import to_shape
+from shapely import to_geojson
+from sqlalchemy import create_engine
+from sqlalchemy.orm import Query, sessionmaker
+
+from database import base, models
+from database.codes import (
     LifeCycleStatus,
     NameOfPlanCaseDecision,
     TypeOfDecisionMaker,
@@ -22,12 +27,7 @@ from codes import (
     interaction_events_by_status,
     processing_events_by_status,
 )
-from db_helper import DatabaseHelper, User
-from geoalchemy2 import Geometry
-from geoalchemy2.shape import to_shape
-from shapely import to_geojson
-from sqlalchemy import create_engine
-from sqlalchemy.orm import Query, sessionmaker
+from database.db_helper import DatabaseHelper, User
 
 """
 Client for validating and POSTing all Maakuntakaava data to Ryhti API

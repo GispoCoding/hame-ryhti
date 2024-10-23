@@ -1,9 +1,10 @@
 from typing import Type
 
 from geoalchemy2 import Geometry
-from models import CodeBase
 from sqlalchemy import Column
 from sqlalchemy.orm import Session
+
+from database.models import CodeBase
 
 
 class LifeCycleStatus(CodeBase):

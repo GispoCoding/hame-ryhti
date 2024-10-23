@@ -2,13 +2,13 @@ import json
 from copy import deepcopy
 from typing import Callable, Iterable, List, Optional
 
-import codes
-import models
 import pytest
-from base import PROJECT_SRID
 from requests_mock.request import _RequestObjectProxy
-from ryhti_client.ryhti_client import RyhtiClient
 from sqlalchemy.orm import Session
+
+from database import codes, models
+from database.base import PROJECT_SRID
+from lambdas.ryhti_client.ryhti_client import RyhtiClient
 
 
 @pytest.fixture(scope="function")

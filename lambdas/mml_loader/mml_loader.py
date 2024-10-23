@@ -10,12 +10,13 @@ from xml.etree import ElementTree
 
 import pygml
 import requests
-from codes import AdministrativeRegion
-from db_helper import DatabaseHelper, User
 from geoalchemy2.shape import from_shape
 from shapely.geometry import MultiPolygon, shape
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+
+from database.codes import AdministrativeRegion
+from database.db_helper import DatabaseHelper, User
 
 """
 For populating administrative regions (Maakunta) with geometries,

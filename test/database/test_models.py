@@ -1,6 +1,6 @@
-import codes
-import models
 from sqlalchemy.orm import Session
+
+from database import codes, models
 
 """Tests that check all relationships in sqlalchemy classes are defined correctly.
 This caused a lot of trouble with koodistot loader.
