@@ -41,6 +41,7 @@ def create_db(db_manager_url, main_db_params, root_db_params):
         "event_type": 1,
     }
     r = requests.post(db_manager_url, json=payload)
+    r.raise_for_status()
     data = r.json()
     assert data["statusCode"] == 200, data["body"]
     yield
@@ -52,6 +53,7 @@ def create_db(db_manager_url, main_db_params, root_db_params):
 def populate_koodistot(koodistot_loader_url, main_db_params, create_db):
     payload = {}
     r = requests.post(koodistot_loader_url, json=payload)
+    r.raise_for_status()
     data = r.json()
     assert data["statusCode"] == 200, data["body"]
 
@@ -60,6 +62,7 @@ def populate_koodistot(koodistot_loader_url, main_db_params, create_db):
 def populate_suomifi_koodistot(koodistot_loader_url, main_db_params, create_db):
     payload = {"local_codes": False}
     r = requests.post(koodistot_loader_url, json=payload)
+    r.raise_for_status()
     data = r.json()
     assert data["statusCode"] == 200, data["body"]
 
@@ -68,6 +71,7 @@ def populate_suomifi_koodistot(koodistot_loader_url, main_db_params, create_db):
 def populate_local_koodistot(koodistot_loader_url, main_db_params, create_db):
     payload = {"suomifi_codes": False}
     r = requests.post(koodistot_loader_url, json=payload)
+    r.raise_for_status()
     data = r.json()
     assert data["statusCode"] == 200, data["body"]
 
@@ -213,6 +217,7 @@ def validate_invalid_plan(ryhti_client_url, complete_test_plan):
     """
     payload = {"event_type": 1, "save_json": True}
     r = requests.post(ryhti_client_url, json=payload)
+    r.raise_for_status()
     data = r.json()
     print(data)
     assert data["statusCode"] == 200
@@ -389,6 +394,7 @@ def validate_valid_plan_in_preparation(ryhti_client_url, valid_plan_in_preparati
     """
     payload = {"event_type": 1, "save_json": True}
     r = requests.post(ryhti_client_url, json=payload)
+    r.raise_for_status()
     data = r.json()
     print(data)
     assert data["statusCode"] == 200
