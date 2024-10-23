@@ -1,6 +1,18 @@
+[build-system]
+requires = ["setuptools >= 61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ryhti-database-tools"
+version = "0.1.0"
+
+[tool.setuptools]
+packages = ["database", "lambdas"]
+
 [tool.isort]
 # Black compatible values for isort https://black.readthedocs.io/en/stable/compatible_configs.html#isort
 profile = "black"
+known_first_party = ["database"]
 
 [tool.pytest.ini_options]
 pythonpath = [
