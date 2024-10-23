@@ -63,7 +63,7 @@ services:
       - db
       - mock_xroad
     volumes:
-      - ./lambdas/ryhti_debug:/var/task/ryhti_debug
+      - ./ryhti_debug:/var/task/ryhti_debug
 
   mml_loader:
     build:
