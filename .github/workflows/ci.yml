@@ -24,10 +24,9 @@ jobs:
       - name: Copy .env file
         run: cp .env.dev .env
       - name: Create debug directory
-        run: mkdir database/ryhti_debug
+        run: mkdir ryhti_debug
       - name: Test
         run: python -m pytest
-        working-directory: database
         env:
           SYKE_APIKEY: ${{ secrets.SYKE_APIKEY }}
           MML_APIKEY: ${{ secrets.MML_APIKEY }}
