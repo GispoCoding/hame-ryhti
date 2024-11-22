@@ -200,6 +200,7 @@ class RyhtiClient:
         plan_uuid: Optional[str] = None,
         debug_json: Optional[bool] = False,  # save JSON files for debugging
     ) -> None:
+        LOGGER.info("Initializing Ryhti client...")
         self.event_type = event_type
         self.debug_json = debug_json
 
@@ -267,17 +268,16 @@ class RyhtiClient:
         # Otherwise, we may access old plan data without having to create a session
         # and query.
         with self.Session(expire_on_commit=False) as session:
+            LOGGER.info("Caching requested plans from database...")
             # Only process specified plans
             plan_query: Query = session.query(models.Plan)
             if plan_uuid:
+                LOGGER.info(f"Only fetching plan {plan_uuid}")
                 plan_query = plan_query.filter_by(id=plan_uuid)
             self.plans = {plan.id: plan for plan in plan_query.all()}
-            print(plan_query.all())
         if not self.plans:
-            print("no plans")
             LOGGER.info("No plans found in database.")
         else:
-            print("got plans")
             LOGGER.info("Client initialized with plans to process:")
             LOGGER.info(self.plans)
 
