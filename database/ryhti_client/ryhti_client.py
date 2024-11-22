@@ -11,14 +11,13 @@ import models
 import requests
 import simplejson as json  # type: ignore
 from codes import (
-    LifeCycleStatus,
     NameOfPlanCaseDecision,
     TypeOfDecisionMaker,
     TypeOfInteractionEvent,
     TypeOfProcessingEvent,
     decisionmaker_by_status,
     decisions_by_status,
-    get_code,
+    get_code_uri,
     interaction_events_by_status,
     processing_events_by_status,
 )
@@ -27,7 +26,6 @@ from geoalchemy2 import Geometry
 from geoalchemy2.shape import to_shape
 from shapely import to_geojson
 from sqlalchemy import create_engine
-from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import Query, sessionmaker
 
 """
@@ -143,7 +141,7 @@ class RyhtiPlan(TypedDict, total=False):
 
 class RyhtiPlanDecision(TypedDict, total=False):
     planDecisionKey: str
-    name: Dict
+    name: str
     decisionDate: str
     dateOfDecision: str
     typeOfDecisionMaker: str
@@ -248,9 +246,17 @@ class RyhtiClient:
         # Cache valid plan matters after validation, so they can be processed further.
         self.valid_plan_matters: Dict[str, RyhtiPlanMatter] = dict()
 
-        self.initiated_status: LifeCycleStatus
-        self.approved_status: LifeCycleStatus
-        self.valid_status: LifeCycleStatus
+        # We only ever need code uri values, not codes themselves, so let's not bother
+        # fetching codes from the database at all. URI is known from class and value.
+        # TODO: check that valid status is "13" and approval status is "06" when
+        # the lifecycle status code list transitions from DRAFT to VALID.
+        #
+        # It is exceedingly weird that this, the most important of all codes, is
+        # *not* a descriptive string, but a random number that may change, while all
+        # the other code lists have descriptive strings that will *not* change.
+        self.pending_status_value = "02"
+        self.approved_status_value = "06"
+        self.valid_status_value = "13"
 
         # Do some prefetching before starting the run.
         #
@@ -261,56 +267,6 @@ class RyhtiClient:
         # Otherwise, we may access old plan data without having to create a session
         # and query.
         with self.Session(expire_on_commit=False) as session:
-            # Lifecycle status "valid" is used everywhere, so let's fetch it ready.
-            # TODO: check that valid status is "13" and approval status is "06" when
-            # the lifecycle status code list transitions from DRAFT to VALID.
-            #
-            # It is exceedingly weird that this, the most important of all statuses, is
-            # *not* a descriptive string, but a random number that may change, while all
-            # the other code lists have descriptive strings that will *not* change.
-            self.pending_status = get_code(session, LifeCycleStatus, "02")
-            self.approved_status = get_code(session, LifeCycleStatus, "06")
-            self.valid_status = get_code(session, LifeCycleStatus, "13")
-            # Plan decisions, processing events and interaction events are best
-            # prefetched, they will depend on the status of each plan:
-            self.decisions_by_status = {
-                status_code: (
-                    [
-                        get_code(session, NameOfPlanCaseDecision, decision_code)
-                        for decision_code in decisions
-                    ]
-                    if decisions
-                    else []
-                )
-                for status_code, decisions in decisions_by_status.items()
-            }
-            self.processing_events_by_status = {
-                status_code: (
-                    [
-                        get_code(session, TypeOfProcessingEvent, processing_code)
-                        for processing_code in processing_events
-                    ]
-                    if processing_events
-                    else []
-                )
-                for status_code, processing_events in processing_events_by_status.items()  # noqa
-            }
-            self.interaction_events_by_status = {
-                status_code: (
-                    [
-                        get_code(session, TypeOfInteractionEvent, interaction_code)
-                        for interaction_code in interactions
-                    ]
-                    if interactions
-                    else []
-                )
-                for status_code, interactions in interaction_events_by_status.items()
-            }
-            self.decisionmaker_by_status = {
-                status_code: get_code(session, TypeOfDecisionMaker, decisionmaker)
-                for status_code, decisionmaker in decisionmaker_by_status.items()
-            }
-
             # Only process specified plans
             plan_query: Query = session.query(models.Plan)
             if plan_uuid:
@@ -405,21 +361,17 @@ class RyhtiClient:
         return None
 
     def get_lifecycle_dates(
-        self, plan_base: base.PlanBase, status: Optional[LifeCycleStatus]
+        self, plan_base: base.PlanBase, status_value: str
     ) -> Optional[Period]:
         """
         Returns the start and end dates of a lifecycle status for object, or
         None if no dates are found.
         """
-        if not status:
-            # it is possible for tests etc. to look for a status that
-            # is actually not present in the database at all.
-            return None
         for lifecycle_date in plan_base.lifecycle_dates:
             # Note that the lifecycle status fetched from database
             # and the one in the plan are not the same sqlalchemy object,
             # because they are fetched in different sessions!
-            if lifecycle_date.lifecycle_status.value == status.value:
+            if lifecycle_date.lifecycle_status.value == status_value:
                 return {
                     "begin": (
                         lifecycle_date.starting_at.date().isoformat()
@@ -449,7 +401,7 @@ class RyhtiClient:
             recommendation_dict["planThemes"] = [plan_recommendation.plan_theme.uri]
         recommendation_dict["recommendationNumber"] = plan_recommendation.ordering
         recommendation_dict["periodOfValidity"] = self.get_lifecycle_dates(
-            plan_recommendation, self.valid_status
+            plan_recommendation, self.valid_status_value
         )
         recommendation_dict["value"] = plan_recommendation.text_value
         return recommendation_dict
@@ -468,7 +420,7 @@ class RyhtiClient:
             regulation_dict["subjectIdentifiers"] = [plan_regulation.name["fin"]]
         regulation_dict["regulationNumber"] = str(plan_regulation.ordering)
         regulation_dict["periodOfValidity"] = self.get_lifecycle_dates(
-            plan_regulation, self.valid_status
+            plan_regulation, self.valid_status_value
         )
         if plan_regulation.type_of_verbal_plan_regulation:
             regulation_dict["verbalRegulations"] = [
@@ -554,7 +506,7 @@ class RyhtiClient:
         plan_object_dict["description"] = plan_object.description
         plan_object_dict["objectNumber"] = plan_object.ordering
         plan_object_dict["periodOfValidity"] = self.get_lifecycle_dates(
-            plan_object, self.valid_status
+            plan_object, self.valid_status_value
         )
         if plan_object.height_range:
             plan_object_dict["verticalLimit"] = {
@@ -664,9 +616,9 @@ class RyhtiClient:
 
         # Dates come from plan lifecycle dates.
         plan_dictionary["periodOfValidity"] = self.get_lifecycle_dates(
-            plan, self.valid_status
+            plan, self.valid_status_value
         )
-        period_of_approval = self.get_lifecycle_dates(plan, self.approved_status)
+        period_of_approval = self.get_lifecycle_dates(plan, self.approved_status_value)
         plan_dictionary["approvalDate"] = (
             period_of_approval["begin"] if period_of_approval else None
         )
@@ -691,27 +643,24 @@ class RyhtiClient:
         decisions: List[RyhtiPlanDecision] = []
         # Decision name must correspond to the phase the plan is in. This requires
         # mapping from lifecycle statuses to decision names.
-        print(self.decisions_by_status.get(plan.lifecycle_status.value, []))
-        for decision in self.decisions_by_status.get(plan.lifecycle_status.value, []):
-            if not decision:
-                # decision not found in database, probably we are running tests, haven't
-                # run code import, or code lists have mysteriously changed!
-                raise NoResultFound()
+        print(decisions_by_status.get(plan.lifecycle_status.value, []))
+        for decision_value in decisions_by_status.get(plan.lifecycle_status.value, []):
             entry = RyhtiPlanDecision()
             # TODO: Let's just have random uuid for now, on the assumption that each
             # phase is only POSTed to ryhti once. If planners need to post and repost
             # the same phase, script needs logic to check if the phase exists in Ryhti
             # already before reposting.
             entry["planDecisionKey"] = str(uuid4())
-            entry["name"] = decision.uri
-            entry["typeOfDecisionMaker"] = self.decisionmaker_by_status[
-                plan.lifecycle_status.value
-            ].uri
+            entry["name"] = get_code_uri(NameOfPlanCaseDecision, decision_value)
+            entry["typeOfDecisionMaker"] = get_code_uri(
+                TypeOfDecisionMaker,
+                decisionmaker_by_status[plan.lifecycle_status.value],
+            )
             # Plan must be embedded in decision when POSTing!
             entry["plans"] = [self.plan_dictionaries[plan.id]]
 
             period_of_current_status = self.get_lifecycle_dates(
-                plan, plan.lifecycle_status
+                plan, plan.lifecycle_status.value
             )
             if not period_of_current_status:
                 raise AssertionError(
@@ -731,23 +680,21 @@ class RyhtiClient:
         events: List[Dict] = []
         # Decision name must correspond to the phase the plan is in. This requires
         # mapping from lifecycle statuses to decision names.
-        for event in self.processing_events_by_status.get(
+        for event_value in processing_events_by_status.get(
             plan.lifecycle_status.value, []
         ):
-            if not event:
-                # event not found in database, probably we are running tests, haven't
-                # run code import, or code lists have mysteriously changed!
-                raise NoResultFound()
             entry: Dict[str, Any] = dict()
             # TODO: Let's just have random uuid for now, on the assumption that each
             # phase is only POSTed to ryhti once. If planners need to post and repost
             # the same phase, script needs logic to check if the phase exists in Ryhti
             # already before reposting.
             entry["handlingEventKey"] = str(uuid4())
-            entry["handlingEventType"] = event.uri
+            entry["handlingEventType"] = get_code_uri(
+                TypeOfProcessingEvent, event_value
+            )
 
             period_of_current_status = self.get_lifecycle_dates(
-                plan, plan.lifecycle_status
+                plan, plan.lifecycle_status.value
             )
             if not period_of_current_status:
                 raise AssertionError(
@@ -766,23 +713,21 @@ class RyhtiClient:
         events: List[Dict] = []
         # Decision name must correspond to the phase the plan is in. This requires
         # mapping from lifecycle statuses to decision names.
-        for event in self.interaction_events_by_status.get(
+        for event_value in interaction_events_by_status.get(
             plan.lifecycle_status.value, []
         ):
-            if not event:
-                # event not found in database, probably we are running tests, haven't
-                # run code import, or code lists have mysteriously changed!
-                raise NoResultFound()
             entry: Dict[str, Any] = dict()
             # TODO: Let's just have random uuid for now, on the assumption that each
             # phase is only POSTed to ryhti once. If planners need to post and repost
             # the same phase, script needs logic to check if the phase exists in Ryhti
             # already before reposting.
             entry["interactionEventKey"] = str(uuid4())
-            entry["interactionEventType"] = event.uri
+            entry["interactionEventType"] = get_code_uri(
+                TypeOfInteractionEvent, event_value
+            )
 
             period_of_current_status = self.get_lifecycle_dates(
-                plan, plan.lifecycle_status
+                plan, plan.lifecycle_status.value
             )
             if not period_of_current_status:
                 raise AssertionError(
@@ -863,7 +808,7 @@ class RyhtiClient:
         # only contains description, and only in one language.
         plan_matter["name"] = plan.name
 
-        period_of_initiation = self.get_lifecycle_dates(plan, self.pending_status)
+        period_of_initiation = self.get_lifecycle_dates(plan, self.pending_status_value)
         plan_matter["timeOfInitiation"] = (
             period_of_initiation["begin"] if period_of_initiation else None
         )
