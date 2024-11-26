@@ -39,8 +39,37 @@ X-Road POST API:
 https://github.com/sykefi/Ryhti-rajapintakuvaukset/blob/main/OpenApi/Kaavoitus/Palveluväylä/Kaavoitus%20OpenApi.json
 """
 
+# All non-request specific initialization should be done *before* the handler
+# method is run. It is run with burst CPU, so we will get faster initialization.
+# Boto3 and db helper initialization should go here.
 LOGGER = logging.getLogger()
 LOGGER.setLevel(logging.INFO)
+# write access is required to update plan information after
+# validating or POSTing data
+db_helper = DatabaseHelper(user=User.READ_WRITE)
+# Let's fetch the syke secret from AWS secrets, so it cannot be read in plain
+# text when looking at lambda env variables.
+if os.environ.get("READ_FROM_AWS", "1") == "1":
+    session = boto3.session.Session()
+    client = session.client(
+        service_name="secretsmanager",
+        region_name=os.environ.get("AWS_REGION_NAME", ""),
+    )
+    xroad_syke_client_secret = client.get_secret_value(
+        SecretId=os.environ.get("XROAD_SYKE_CLIENT_SECRET_ARN", "")
+    )["SecretString"]
+else:
+    xroad_syke_client_secret = os.environ.get("XROAD_SYKE_CLIENT_SECRET", "")
+public_api_key = os.environ.get("SYKE_APIKEY", "")
+if not public_api_key:
+    raise ValueError("Please set SYKE_APIKEY environment variable to run Ryhti client.")
+xroad_server_address = os.environ.get("XROAD_SERVER_ADDRESS", "")
+xroad_member_code = os.environ.get("XROAD_MEMBER_CODE", "")
+xroad_member_client_name = os.environ.get("XROAD_MEMBER_CLIENT_NAME", "")
+xroad_port = int(os.environ.get("XROAD_HTTP_PORT", 8080))
+xroad_instance = os.environ.get("XROAD_INSTANCE", "FI-TEST")
+xroad_member_class = os.environ.get("XROAD_MEMBER_CLASS", "MUN")
+xroad_syke_client_id = os.environ.get("XROAD_SYKE_CLIENT_ID", "")
 
 
 class Action(enum.Enum):
@@ -81,7 +110,7 @@ class Response(TypedDict):
     """
 
     statusCode: int  # noqa N815
-    body: str | ResponseBody  # Response body must be stringified for API gateway
+    body: ResponseBody
 
 
 class Event(TypedDict):
@@ -117,6 +146,17 @@ class AWSAPIGatewayPayload(TypedDict):
     queryStringParameters: Dict
     requestContext: Dict
     body: str  # The event is stringified json, we have to jsonify it first
+
+
+class AWSAPIGatewayResponse(TypedDict):
+    """
+    Represents the response from Lambda to AWS API Gateway.
+
+    For the API gateway, we just have to stringify the body.
+    """
+
+    statusCode: int
+    body: str  # Response body must be stringified for API gateway
 
 
 class Period(TypedDict):
@@ -1409,15 +1449,25 @@ class RyhtiClient:
         )
 
 
-def bodify(body: ResponseBody, using_api_gateway: bool = False) -> str | ResponseBody:
+def responsify(
+    response: Response, using_api_gateway: bool = False
+) -> Response | AWSAPIGatewayResponse:
     """
-    Convert response body to JSON string if the request arrived through API gateway.
+    Convert response to API gateway response if the request arrived through API gateway.
     If we want to provide status code to API gateway, the JSON body must be string.
     """
-    return json.dumps(body) if using_api_gateway else body
+    return (
+        AWSAPIGatewayResponse(
+            statusCode=response["statusCode"], body=json.dumps(response["body"])
+        )
+        if using_api_gateway
+        else response
+    )
 
 
-def handler(payload: Event | AWSAPIGatewayPayload, _) -> Response:
+def handler(
+    payload: Event | AWSAPIGatewayPayload, _
+) -> Response | AWSAPIGatewayResponse:
     """
     Handler which is called when accessing the endpoint. We must handle both API
     gateway HTTP requests and regular lambda requests. API gateway requires
@@ -1442,9 +1492,6 @@ def handler(payload: Event | AWSAPIGatewayPayload, _) -> Response:
         # Direct lambda request
         event = cast(Event, payload)
 
-    # write access is required to update plan information after
-    # validating or POSTing data
-    db_helper = DatabaseHelper(user=User.READ_WRITE)
     try:
         event_type = Action(event["action"])
     except KeyError:
@@ -1452,44 +1499,19 @@ def handler(payload: Event | AWSAPIGatewayPayload, _) -> Response:
     except ValueError:
         response_title = "Unknown action."
         LOGGER.info(response_title)
-        return Response(
-            statusCode=400,
-            body=bodify(
-                ResponseBody(
+        return responsify(
+            Response(
+                statusCode=400,
+                body=ResponseBody(
                     title=response_title,
                     details={event["action"]: "Unknown action."},
                     ryhti_responses={},
                 ),
-                using_api_gateway,
             ),
+            using_api_gateway,
         )
     debug_json = event.get("save_json", False)
     plan_uuid = event.get("plan_uuid", None)
-    public_api_key = os.environ.get("SYKE_APIKEY")
-    if not public_api_key:
-        raise ValueError(
-            "Please set SYKE_APIKEY environment variable to run Ryhti client."
-        )
-    xroad_server_address = os.environ.get("XROAD_SERVER_ADDRESS")
-    xroad_member_code = os.environ.get("XROAD_MEMBER_CODE")
-    xroad_member_client_name = os.environ.get("XROAD_MEMBER_CLIENT_NAME")
-    xroad_port = int(os.environ.get("XROAD_HTTP_PORT", 8080))
-    xroad_instance = os.environ.get("XROAD_INSTANCE", "FI-TEST")
-    xroad_member_class = os.environ.get("XROAD_MEMBER_CLASS", "MUN")
-    xroad_syke_client_id = os.environ.get("XROAD_SYKE_CLIENT_ID")
-    # Let's fetch the syke secret from AWS secrets, so it cannot be read in plain
-    # text when looking at lambda env variables.
-    if os.environ.get("READ_FROM_AWS", "1") == "1":
-        session = boto3.session.Session()
-        client = session.client(
-            service_name="secretsmanager",
-            region_name=os.environ.get("AWS_REGION_NAME"),
-        )
-        xroad_syke_client_secret = client.get_secret_value(
-            SecretId=os.environ.get("XROAD_SYKE_CLIENT_SECRET_ARN")
-        )["SecretString"]
-    else:
-        xroad_syke_client_secret = os.environ.get("XROAD_SYKE_CLIENT_SECRET")
     if event_type is Action.POST_PLANS and (
         not xroad_server_address
         or not xroad_member_code
@@ -1532,16 +1554,16 @@ def handler(payload: Event | AWSAPIGatewayPayload, _) -> Response:
             # just return the JSON to the user
             response_title = "Returning serialized plans from database."
             LOGGER.info(response_title)
-            return Response(
-                statusCode=200,
-                body=bodify(
-                    ResponseBody(
+            return responsify(
+                Response(
+                    statusCode=200,
+                    body=ResponseBody(
                         title=response_title,
-                        details=client.plan_dictionaries,
+                        details=cast(dict, client.plan_dictionaries),
                         ryhti_responses={},
                     ),
-                    using_api_gateway,
                 ),
+                using_api_gateway,
             )
 
         # 2) Validate plans in database with public API
@@ -1646,6 +1668,4 @@ def handler(payload: Event | AWSAPIGatewayPayload, _) -> Response:
         )
 
     LOGGER.info(lambda_response["body"]["title"])
-    # Before responding, make sure the response body has correct format
-    lambda_response["body"] = bodify(lambda_response["body"], using_api_gateway)
-    return cast(Response, lambda_response)
+    return responsify(lambda_response, using_api_gateway)
