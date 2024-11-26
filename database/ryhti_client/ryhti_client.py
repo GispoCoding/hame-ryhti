@@ -1449,13 +1449,6 @@ class RyhtiClient:
         )
 
 
-# def bodify(body: ResponseBody, using_api_gateway: bool = False) -> str | ResponseBody:
-#     """
-#     Convert response body to JSON string if the request arrived through API gateway.
-#     """
-#     return json.dumps(body) if using_api_gateway else body
-
-
 def responsify(
     response: Response, using_api_gateway: bool = False
 ) -> Response | AWSAPIGatewayResponse:
@@ -1675,11 +1668,4 @@ def handler(
         )
 
     LOGGER.info(lambda_response["body"]["title"])
-    # Before responding, make sure the response body has correct format
     return responsify(lambda_response, using_api_gateway)
-    # lambda_response["body"] = bodify(lambda_response["body"], using_api_gateway)
-    # return (
-    #     cast(AWSAPIGatewayResponse, lambda_response)
-    #     if using_api_gateway
-    #     else cast(Response, lambda_response)
-    # )
