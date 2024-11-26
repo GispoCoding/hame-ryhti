@@ -105,6 +105,8 @@ resource "aws_iam_policy" "lambda_update_policy" {
           "Resource": "*"
       },
       {
+        # Lambda upload user is used in Github actions for both updating the function
+        # AND invoking the db manager after update.
         "Effect" : "Allow",
         "Action" : [
           "lambda:CreateFunction",
@@ -222,4 +224,33 @@ resource "aws_iam_instance_profile" "ec2-iam-profile" {
 resource "aws_iam_role_policy_attachment" "ssm-policy-attachment" {
   role       = aws_iam_role.ec2-role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
+
+# We need an extra policy to allow calling ryhti client URL from the EC2 server
+# without authentication or user role.
+resource "aws_iam_policy" "ec2-invoke-ryhti-client" {
+  name        = "${var.prefix}-ec2_invoke_ryhti_client_policy"
+  path        = "/"
+  description = "EC2 Ryhti client invoke policy"
+
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        # Only allow calling Ryhti client lambda
+        "Effect" : "Allow",
+        "Action" : [
+          "lambda:InvokeFunction",
+         ],
+        "Resource" : [
+          aws_lambda_function.ryhti_client.arn,
+        ]
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "ec2-invoke-ryhti-client-attachment" {
+  role       = aws_iam_role.ec2-role.name
+  policy_arn = aws_iam_policy.ec2-invoke-ryhti-client.arn
 }
