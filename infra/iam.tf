@@ -109,6 +109,7 @@ resource "aws_iam_policy" "lambda_update_policy" {
         # AND invoking the db manager after update.
         "Effect" : "Allow",
         "Action" : [
+          "lambda:GetFunction",
           "lambda:CreateFunction",
           "lambda:UpdateFunctionCode",
           "lambda:InvokeFunction",
