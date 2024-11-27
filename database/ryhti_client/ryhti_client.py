@@ -26,6 +26,7 @@ from geoalchemy2 import Geometry
 from geoalchemy2.shape import to_shape
 from shapely import to_geojson
 from sqlalchemy import create_engine
+from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import Query, sessionmaker
 
 """
@@ -723,6 +724,10 @@ class RyhtiClient:
         for event_value in processing_events_by_status.get(
             plan.lifecycle_status.value, []
         ):
+            if not event:
+                # event not found in database, probably we are running tests, haven't
+                # run code import, or code lists have mysteriously changed!
+                raise NoResultFound()
             entry: Dict[str, Any] = dict()
             # TODO: Let's just have random uuid for now, on the assumption that each
             # phase is only POSTed to ryhti once. If planners need to post and repost
@@ -756,6 +761,10 @@ class RyhtiClient:
         for event_value in interaction_events_by_status.get(
             plan.lifecycle_status.value, []
         ):
+            if not event:
+                # event not found in database, probably we are running tests, haven't
+                # run code import, or code lists have mysteriously changed!
+                raise NoResultFound()
             entry: Dict[str, Any] = dict()
             # TODO: Let's just have random uuid for now, on the assumption that each
             # phase is only POSTed to ryhti once. If planners need to post and repost
@@ -1448,7 +1457,6 @@ class RyhtiClient:
             ),
         )
 
-
 def responsify(
     response: Response, using_api_gateway: bool = False
 ) -> Response | AWSAPIGatewayResponse:
@@ -1463,7 +1471,6 @@ def responsify(
         if using_api_gateway
         else response
     )
-
 
 def handler(
     payload: Event | AWSAPIGatewayPayload, _
