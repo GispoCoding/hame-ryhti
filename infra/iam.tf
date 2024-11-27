@@ -112,7 +112,9 @@ resource "aws_iam_policy" "lambda_update_policy" {
           "lambda:CreateFunction",
           "lambda:UpdateFunctionCode",
           "lambda:InvokeFunction",
-          "lambda:UpdateFunctionConfiguration"
+          "lambda:UpdateFunctionConfiguration",
+          "lambda:PublishVersion",
+          "lambda:UpdateAlias"
          ],
         "Resource" : [
           aws_lambda_function.db_manager.arn,
