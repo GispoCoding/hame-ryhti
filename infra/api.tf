@@ -12,17 +12,11 @@ resource "aws_api_gateway_rest_api" "lambda_api" {
             Action = "execute-api:Invoke",
             # TODO: should we only add EC2 here??
             Principal = "*",
-            Resource = [
-                "execute-api:/*"
-            ]
         },
         {
             Effect = "Deny",
             Action = "execute-api:Invoke",
             Principal = "*",
-            Resource = [
-                "execute-api:/*"
-            ],
             Condition = {
                 StringNotEquals = {
                    "aws:SourceVpce": aws_vpc_endpoint.lambda_api.id,
