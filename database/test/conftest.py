@@ -1860,8 +1860,8 @@ def desired_plan_matter_dict(
         "timeOfInitiation": "2024-01-01",
         "description": plan_instance.description,
         "producerPlanIdentifier": plan_instance.producers_plan_identifier,
-        "caseIdentifiers": [plan_instance.matter_management_identifier],
-        "recordNumbers": [plan_instance.record_number],
+        "caseIdentifiers": [],
+        "recordNumbers": [],
         "administrativeAreaIdentifiers": ["01"],
         "digitalOrigin": "http://uri.suomi.fi/codelist/rytj/RY_DigitaalinenAlkupera/code/01",
         "planMatterPhases": [

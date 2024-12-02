@@ -855,8 +855,14 @@ class RyhtiClient:
         # Hooray, unlike plan, the plan *matter* description allows multilanguage data!
         plan_matter["description"] = plan.description
         plan_matter["producerPlanIdentifier"] = plan.producers_plan_identifier
-        plan_matter["caseIdentifiers"] = [plan.matter_management_identifier]
-        plan_matter["recordNumbers"] = [plan.record_number]
+        plan_matter["caseIdentifiers"] = (
+            [plan.matter_management_identifier]
+            if plan.matter_management_identifier
+            else []
+        )
+        plan_matter["recordNumbers"] = (
+            [plan.record_number] if plan.record_number else []
+        )
         # Apparently Ryhti plans may cover multiple administrative areas, so the region
         # identifier has to be embedded in a list.
         plan_matter["administrativeAreaIdentifiers"] = [
