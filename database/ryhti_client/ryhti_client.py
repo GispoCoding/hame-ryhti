@@ -754,8 +754,9 @@ class RyhtiClient:
                 TypeOfProcessingEvent, event_value
             )
 
+            # Handling event time is not time after all. It must be a date :D
             period_of_current_status = self.get_lifecycle_dates(
-                plan, plan.lifecycle_status.value
+                plan, plan.lifecycle_status.value, datetimes=False
             )
             if not period_of_current_status:
                 raise AssertionError(

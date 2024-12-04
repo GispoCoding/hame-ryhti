@@ -1876,7 +1876,7 @@ def desired_plan_matter_dict(
                 "handlingEvent": {
                     "handlingEventKey": "whatever",
                     "handlingEventType": "http://uri.suomi.fi/codelist/rytj/kaavakastap/code/05",
-                    "eventTime": "2024-01-31T22:00:00Z",
+                    "eventTime": "2024-02-01",
                     "cancelled": False,
                 },
                 "interactionEvents": [
