@@ -23,7 +23,7 @@ def test_modified_at_triggers(
     plan_proposition_instance: models.PlanProposition,
     source_data_instance: models.SourceData,
     organisation_instance: models.Organisation,
-    document_instance: models.Document,
+    plan_map_instance: models.Document,
     lifecycle_date_instance: models.LifeCycleDate,
 ):
     # Save old modified_at timestamps
@@ -40,7 +40,7 @@ def test_modified_at_triggers(
     plan_proposition_instance_old_modified_at = plan_proposition_instance.modified_at
     source_data_instance_old_modified_at = source_data_instance.modified_at
     organisation_instance_old_modified_at = organisation_instance.modified_at
-    document_instance_old_modified_at = document_instance.modified_at
+    plan_map_instance_old_modified_at = plan_map_instance.modified_at
     lifecycle_date_instance_old_modified_at = lifecycle_date_instance.modified_at
 
     # Edit tables to fire the triggers
@@ -55,7 +55,7 @@ def test_modified_at_triggers(
     plan_proposition_instance.text_value = "foo"
     source_data_instance.additional_information_uri = "http://test2.fi"
     organisation_instance.business_id = "foo"
-    document_instance.name = "foo"
+    plan_map_instance.name = "foo"
     lifecycle_date_instance.ending_at = datetime.now()
     session.flush()
     session.refresh(plan_instance)
@@ -69,7 +69,7 @@ def test_modified_at_triggers(
     session.refresh(plan_proposition_instance)
     session.refresh(source_data_instance)
     session.refresh(organisation_instance)
-    session.refresh(document_instance)
+    session.refresh(plan_map_instance)
     session.refresh(lifecycle_date_instance)
 
     assert plan_instance.modified_at != plan_old_modified_at
@@ -91,7 +91,7 @@ def test_modified_at_triggers(
     )
     assert source_data_instance.modified_at != source_data_instance_old_modified_at
     assert organisation_instance.modified_at != organisation_instance_old_modified_at
-    assert document_instance != document_instance_old_modified_at
+    assert plan_map_instance != plan_map_instance_old_modified_at
     assert (
         lifecycle_date_instance.modified_at != lifecycle_date_instance_old_modified_at
     )
@@ -150,28 +150,44 @@ def test_new_lifecycle_date_triggers(
     session.refresh(other_point_instance)
 
     # Get old and new entries in lifecycle_date table
-    plan_new_lifecycle_date = plan_instance.lifecycle_dates[0]
-    plan_regulation_new_lifecycle_date = text_plan_regulation_instance.lifecycle_dates[
-        0
-    ]
-    plan_proposition_new_lifecycle_date = plan_proposition_instance.lifecycle_dates[0]
-    land_use_area_new_lifecycle_date = land_use_area_instance.lifecycle_dates[0]
-    other_area_new_lifecycle_date = other_area_instance.lifecycle_dates[0]
-    line_new_lifecycle_date = line_instance.lifecycle_dates[0]
-    land_use_point_new_lifecycle_date = land_use_point_instance.lifecycle_dates[0]
-    other_point_new_lifecycle_date = other_point_instance.lifecycle_dates[0]
+    def get_new_lifecycle_date(instance: models.PlanBase) -> models.LifeCycleDate:
+        return [
+            date
+            for date in instance.lifecycle_dates
+            if date.lifecycle_status == code_instance
+        ][0]
 
-    plan_old_lifecycle_date = plan_instance.lifecycle_dates[1]
-    plan_regulation_old_lifecycle_date = text_plan_regulation_instance.lifecycle_dates[
-        1
-    ]
-    plan_proposition_old_lifecycle_date = plan_proposition_instance.lifecycle_dates[1]
-    land_use_area_old_lifecycle_date = land_use_area_instance.lifecycle_dates[1]
-    other_area_old_lifecycle_date = other_area_instance.lifecycle_dates[1]
-    line_old_lifecycle_date = line_instance.lifecycle_dates[1]
-    land_use_point_old_lifecycle_date = land_use_point_instance.lifecycle_dates[1]
-    other_point_old_lifecycle_date = other_point_instance.lifecycle_dates[1]
-    session.flush()
+    def get_old_lifecycle_date(instance: models.PlanBase) -> models.LifeCycleDate:
+        return [
+            date
+            for date in instance.lifecycle_dates
+            if date.lifecycle_status == another_code_instance
+        ][0]
+
+    plan_new_lifecycle_date = get_new_lifecycle_date(plan_instance)
+    plan_regulation_new_lifecycle_date = get_new_lifecycle_date(
+        text_plan_regulation_instance
+    )
+    plan_proposition_new_lifecycle_date = get_new_lifecycle_date(
+        plan_proposition_instance
+    )
+    land_use_area_new_lifecycle_date = get_new_lifecycle_date(land_use_area_instance)
+    other_area_new_lifecycle_date = get_new_lifecycle_date(other_area_instance)
+    line_new_lifecycle_date = get_new_lifecycle_date(line_instance)
+    land_use_point_new_lifecycle_date = get_new_lifecycle_date(land_use_point_instance)
+    other_point_new_lifecycle_date = get_new_lifecycle_date(other_point_instance)
+    plan_old_lifecycle_date = get_old_lifecycle_date(plan_instance)
+    plan_regulation_old_lifecycle_date = get_old_lifecycle_date(
+        text_plan_regulation_instance
+    )
+    plan_proposition_old_lifecycle_date = get_old_lifecycle_date(
+        plan_proposition_instance
+    )
+    land_use_area_old_lifecycle_date = get_old_lifecycle_date(land_use_area_instance)
+    other_area_old_lifecycle_date = get_old_lifecycle_date(other_area_instance)
+    line_old_lifecycle_date = get_old_lifecycle_date(line_instance)
+    land_use_point_old_lifecycle_date = get_old_lifecycle_date(land_use_point_instance)
+    other_point_old_lifecycle_date = get_old_lifecycle_date(other_point_instance)
 
     assert plan_new_lifecycle_date.lifecycle_status_id == code_instance.id
     assert plan_new_lifecycle_date.starting_at is not None
