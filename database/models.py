@@ -111,6 +111,10 @@ class Plan(PlanBase):
     )
     # Let's load all the codes for objects joined.
     plan_type = relationship("PlanType", backref="plans", lazy="joined")
+    # Also join plan documents
+    documents = relationship(
+        "Document", back_populates="plan", lazy="joined", cascade="delete"
+    )
 
     permanent_plan_identifier: Mapped[Optional[str]]
     producers_plan_identifier: Mapped[Optional[str]]
@@ -534,12 +538,16 @@ class Organisation(VersionedBase):
 
     name: Mapped[language_str]
     business_id: Mapped[str]
+    municipality_id: Mapped[Optional[uuid.UUID]] = mapped_column(
+        ForeignKey("codes.municipality.id", name="municipality_id_fkey")
+    )
     administrative_region_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey(
             "codes.administrative_region.id", name="administrative_region_id_fkey"
         )
     )
     # Let's load all the codes for objects joined.
+    municipality = relationship("Municipality", backref="organisations", lazy="joined")
     administrative_region = relationship(
         "AdministrativeRegion", backref="organisations", lazy="joined"
     )
@@ -556,28 +564,49 @@ class Document(VersionedBase):
         ForeignKey("codes.type_of_document.id", name="type_of_document_id_fkey")
     )
     plan_id: Mapped[uuid.UUID] = mapped_column(
-        ForeignKey("hame.plan.id", name="plan_id_fkey")
+        ForeignKey("hame.plan.id", name="plan_id_fkey", ondelete="CASCADE")
     )
     category_of_publicity_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey(
             "codes.category_of_publicity.id", name="category_of_publicity_id_fkey"
         )
     )
+    personal_data_content_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey(
+            "codes.personal_data_content.id", name="personal_data_content_id_fkey"
+        )
+    )
+    retention_time_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("codes.retention_time.id", name="retention_time_id_fkey")
+    )
+    language_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("codes.language.id", name="language_id_fkey")
+    )
 
     # Let's load all the codes for objects joined.
     type_of_document = relationship(
         "TypeOfDocument", backref="documents", lazy="joined"
     )
-    plan = relationship("Plan", backref="documents")
-    permanent_document_identifier: Mapped[Optional[uuid.UUID]]
-    name: Mapped[str]
-    personal_details: Mapped[str]
-    publicity = relationship(
-        "CategoryOfPublicity", backref="categories_of_publicity", lazy="joined"
+    plan = relationship("Plan", back_populates="documents")
+    category_of_publicity = relationship(
+        "CategoryOfPublicity", backref="documents", lazy="joined"
     )
-    language: Mapped[str]
+    personal_data_content = relationship(
+        "PersonalDataContent", backref="documents", lazy="joined"
+    )
+    retention_time = relationship("RetentionTime", backref="documents", lazy="joined")
+    language = relationship("Language", backref="documents", lazy="joined")
+
+    permanent_document_identifier: Mapped[Optional[uuid.UUID]]  # e.g. diaarinumero
+    name: Mapped[language_str]
+    exported_at: Mapped[Optional[datetime]]
+    # Ryhti key for the latest file version that was uploaded:
+    exported_file_key: Mapped[Optional[uuid.UUID]]
+    arrival_date: Mapped[Optional[datetime]]
+    confirmation_date: Mapped[Optional[datetime]]
     decision: Mapped[bool]
-    decision_date: Mapped[Optional[timestamp]]
+    decision_date: Mapped[Optional[datetime]]
+    document_date: Mapped[datetime]
     url: Mapped[Optional[str]]
 
 
@@ -645,5 +674,64 @@ class LifeCycleDate(VersionedBase):
     lifecycle_status = relationship(
         "LifeCycleStatus", back_populates="lifecycle_dates", lazy="joined"
     )
+    # Let's add backreference to allow lazy loading from this side.
+    event_dates = relationship(
+        "EventDate", back_populates="lifecycle_date", lazy="joined"
+    )
+
+    starting_at: Mapped[Optional[datetime]]
+    ending_at: Mapped[Optional[datetime]]
+
+
+class EventDate(VersionedBase):
+    """
+    Tapahtuman päivämäärät
+
+    Jokaisessa elinkaaritilassa voi olla tiettyjä tapahtumia. Liitetään tapahtuma
+    sille sallittuun elinkaaritilaan. Tapahtuman päivämäärien tulee olla aina
+    elinkaaritilan päivämäärien välissä.
+    """
+
+    __tablename__ = "event_date"
+
+    lifecycle_date_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey(
+            "hame.lifecycle_date.id",
+            name="lifecycle_date_id_fkey",
+            ondelete="CASCADE",
+        ),
+        index=True,
+    )
+    decision_id: Mapped[Optional[uuid.UUID]] = mapped_column(
+        ForeignKey(
+            "codes.name_of_plan_case_decision.id",
+            name="name_of_plan_case_decision_id_fkey",
+        )
+    )
+    processing_event_id: Mapped[Optional[uuid.UUID]] = mapped_column(
+        ForeignKey(
+            "codes.type_of_processing_event.id", name="type_of_processing_event_fkey"
+        )
+    )
+    interaction_event_id: Mapped[Optional[uuid.UUID]] = mapped_column(
+        ForeignKey(
+            "codes.type_of_interaction_event.id", name="type_of_interaction_event_fkey"
+        )
+    )
+
+    # Let's load all the codes for objects joined.
+    lifecycle_date = relationship(
+        "LifeCycleDate", back_populates="event_dates", lazy="joined"
+    )
+    decision = relationship(
+        "NameOfPlanCaseDecision", backref="event_dates", lazy="joined"
+    )
+    processing_event = relationship(
+        "TypeOfProcessingEvent", backref="event_dates", lazy="joined"
+    )
+    interaction_event = relationship(
+        "TypeOfInteractionEvent", backref="event_dates", lazy="joined"
+    )
+
     starting_at: Mapped[Optional[datetime]]
     ending_at: Mapped[Optional[datetime]]
