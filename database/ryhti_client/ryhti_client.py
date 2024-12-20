@@ -1,9 +1,11 @@
 import datetime
+import email.utils
 import enum
 import logging
 import os
 from typing import TYPE_CHECKING, Any, Dict, List, Literal, Optional, TypedDict, cast
 from uuid import uuid4
+from zoneinfo import ZoneInfo
 
 import base
 import boto3
@@ -47,6 +49,8 @@ https://github.com/sykefi/Ryhti-rajapintakuvaukset/blob/main/OpenApi/Kaavoitus/P
 # Boto3 and db helper initialization should go here.
 LOGGER = logging.getLogger()
 LOGGER.setLevel(logging.INFO)
+LOCAL_TZ = ZoneInfo("Europe/Helsinki")
+
 # write access is required to update plan information after
 # validating or POSTing data
 db_helper = DatabaseHelper(user=User.READ_WRITE)
@@ -86,7 +90,7 @@ class RyhtiResponse(TypedDict):
     Represents the response of the Ryhti API to a single API all.
     """
 
-    status: int
+    status: int | None
     detail: Optional[str]
     errors: Optional[dict]
     warnings: Optional[dict]
@@ -175,6 +179,10 @@ class RyhtiPlan(TypedDict, total=False):
     geographicalArea: Dict
     periodOfValidity: Period | None
     approvalDate: str | None
+    planMaps: List
+    planAnnexes: List
+    otherPlanMaterials: List
+    planReport: Dict | None
     generalRegulationGroups: List[Dict]
     planDescription: str
     planObjects: List
@@ -404,25 +412,40 @@ class RyhtiClient:
         return None
 
     def get_lifecycle_dates(
-        self, plan_base: base.PlanBase, status_value: str
+        self, plan_base: base.PlanBase, status_value: str, datetimes: bool = True
     ) -> Optional[Period]:
         """
-        Returns the start and end dates of a lifecycle status for object, or
-        None if no dates are found.
+        Returns the start and end datetimes of a lifecycle status for object, or
+        None if no datetimes are found. Datetimes are isoformatted UTC, but instead
+        of +00:00, Ryhti API requires Z.
+
+        Optionally, only dates instead of datetimes may be returned. Dates must be
+        in the local timezone.
         """
         for lifecycle_date in plan_base.lifecycle_dates:
-            # Note that the lifecycle status fetched from database
-            # and the one in the plan are not the same sqlalchemy object,
-            # because they are fetched in different sessions!
             if lifecycle_date.lifecycle_status.value == status_value:
                 return {
                     "begin": (
-                        lifecycle_date.starting_at.date().isoformat()
+                        (
+                            lifecycle_date.starting_at.isoformat().replace(
+                                "+00:00", "Z"
+                            )
+                            if datetimes
+                            else lifecycle_date.starting_at.astimezone(LOCAL_TZ)
+                            .date()
+                            .isoformat()
+                        )
                         if lifecycle_date.starting_at
                         else None
                     ),
                     "end": (
-                        lifecycle_date.ending_at.date().isoformat()
+                        (
+                            lifecycle_date.ending_at.isoformat().replace("+00:00", "Z")
+                            if datetimes
+                            else lifecycle_date.ending_at.astimezone(LOCAL_TZ)
+                            .date()
+                            .isoformat()
+                        )
                         if lifecycle_date.ending_at
                         else None
                     ),
@@ -616,8 +639,6 @@ class RyhtiClient:
             for regulation_group in plan_object.plan_regulation_groups
         ]
 
-    # TODO: plan documents not implemented yet!
-
     def get_plan_dictionary(self, plan: models.Plan) -> RyhtiPlan:
         """
         Construct a dict of single Ryhti compatible plan from plan in the
@@ -670,6 +691,13 @@ class RyhtiClient:
             period_of_approval["begin"] if period_of_approval else None
         )
 
+        # Documents are divided into different categories. They may only be added
+        # to plan *after* they have been uploaded.
+        plan_dictionary["planMaps"] = []
+        plan_dictionary["planAnnexes"] = []
+        plan_dictionary["otherPlanMaterials"] = []
+        plan_dictionary["planReport"] = None
+
         return plan_dictionary
 
     def get_plan_dictionaries(self) -> Dict[str, RyhtiPlan]:
@@ -681,6 +709,101 @@ class RyhtiClient:
         for plan_id, plan in self.plans.items():
             plan_dictionaries[plan_id] = self.get_plan_dictionary(plan)
         return plan_dictionaries
+
+    def get_plan_map(self, document: models.Document) -> Dict:
+        """
+        Construct a dict of single Ryhti compatible plan map.
+        """
+        plan_map = dict()
+        plan_map["planMapKey"] = document.id
+        plan_map["name"] = document.name
+        plan_map["fileKey"] = document.exported_file_key
+        # TODO: Take the coordinate system from the actual file?
+        plan_map["coordinateSystem"] = str(base.PROJECT_SRID)
+        return plan_map
+
+    def get_plan_attachment_document(self, document: models.Document) -> Dict:
+        """
+        Construct a dict of single Ryhti compatible plan attachment document.
+        """
+        attachment_document = dict()
+        attachment_document["attachmentDocumentKey"] = document.id
+        attachment_document[
+            "documentIdentifier"
+        ] = document.permanent_document_identifier
+        attachment_document["name"] = document.name
+        attachment_document["personalDataContent"] = document.personal_data_content.uri
+        attachment_document["categoryOfPublicity"] = document.category_of_publicity.uri
+        attachment_document["accessibility"] = document.accessibility
+        attachment_document["retentionTime"] = document.retention_time.uri
+        attachment_document["languages"] = [document.language.uri]
+        attachment_document["fileKey"] = document.exported_file_key
+        attachment_document["documentDate"] = document.document_date
+        attachment_document["arrivedDate"] = document.arrival_date
+        attachment_document["typeOfAttachment"] = document.type_of_document.uri
+        return attachment_document
+
+    def get_other_plan_material(self, document: models.Document) -> Dict:
+        """
+        Construct a dict of single Ryhti compatible other plan material item.
+        """
+        other_plan_material = dict()
+        other_plan_material["otherPlanMaterialKey"] = document.id
+        other_plan_material["name"] = document.name
+        other_plan_material["fileKey"] = document.exported_file_key
+        other_plan_material["otherPlanMaterialLink"] = document.url
+        other_plan_material["personalDataContent"] = document.personal_data_content.uri
+        other_plan_material["categoryOfPublicity"] = document.category_of_publicity.uri
+        return other_plan_material
+
+    def add_plan_report_to_plan_dict(
+        self, document: models.Document, plan_dictionary: RyhtiPlan
+    ) -> RyhtiPlan:
+        """
+        Construct a dict of single Ryhti compatible plan report and add it to the
+        provided plan dict. The plan dict may already have existing plan reports.
+        """
+        if not plan_dictionary["planReport"]:
+            plan_dictionary["planReport"] = {
+                "planReportKey": str(uuid4()),
+                "attachmentDocuments": [self.get_plan_attachment_document(document)],
+            }
+        else:
+            plan_dictionary["planReport"]["attachmentDocuments"].append(
+                self.get_plan_attachment_document(document)
+            )
+        return plan_dictionary
+
+    def add_document_to_plan_dict(
+        self, document: models.Document, plan_dictionary: RyhtiPlan
+    ) -> RyhtiPlan:
+        """
+        Construct a dict of single Ryhti compatible plan document and add it to the
+        provided plan dict.
+
+        The exact type of the dictionary to be added depends on the document type.
+        """
+        if document.type_of_document.value == "03":
+            # Kaavakartta
+            plan_dictionary["planMaps"].append(self.get_plan_map(document))
+        elif document.type_of_document.value == "06":
+            # Kaavaselostus
+            # For some reason, if there are multiple plan reports, they will have to be
+            # added inside a single plan report instead of a list of plan reports.
+            plan_dictionary = self.add_plan_report_to_plan_dict(
+                document, plan_dictionary
+            )
+        elif document.type_of_document.value == "99":
+            # Muu asiakirja
+            plan_dictionary["otherPlanMaterials"].append(
+                self.get_other_plan_material(document)
+            )
+        else:
+            # Kaavan liite
+            plan_dictionary["planAnnexes"].append(
+                self.get_plan_attachment_document(document)
+            )
+        return plan_dictionary
 
     def get_plan_decisions(self, plan: models.Plan) -> List[RyhtiPlanDecision]:
         """
@@ -707,7 +830,7 @@ class RyhtiClient:
             entry["plans"] = [self.plan_dictionaries[plan.id]]
 
             period_of_current_status = self.get_lifecycle_dates(
-                plan, plan.lifecycle_status.value
+                plan, plan.lifecycle_status.value, datetimes=False
             )
             if not period_of_current_status:
                 raise AssertionError(
@@ -740,14 +863,16 @@ class RyhtiClient:
                 TypeOfProcessingEvent, event_value
             )
 
+            # Handling event time is not time after all. It must be a date :D
             period_of_current_status = self.get_lifecycle_dates(
-                plan, plan.lifecycle_status.value
+                plan, plan.lifecycle_status.value, datetimes=False
             )
             if not period_of_current_status:
                 raise AssertionError(
                     "Error in plan! Current lifecycle status is missing start date."
                 )
             entry["eventTime"] = period_of_current_status["begin"]
+            entry["cancelled"] = False
 
             events.append(entry)
         return events
@@ -780,11 +905,16 @@ class RyhtiClient:
                 raise AssertionError(
                     "Error in plan! Current lifecycle status is missing start date."
                 )
-            # Interaction eventTime is a period, not a single date. Let us keep it
-            # a zero length period at the moment though.
+            # Interaction eventTime is a period, not a single date. Nähtävilläoloaika
+            # is 30 days.
             entry["eventTime"] = {
                 "begin": (period_of_current_status["begin"]),
-                "end": (period_of_current_status["begin"]),
+                "end": (
+                    datetime.datetime.fromisoformat(period_of_current_status["begin"])
+                    + datetime.timedelta(days=30)
+                )
+                .isoformat()
+                .replace("+00:00", "Z"),
             }
 
             events.append(entry)
@@ -855,19 +985,29 @@ class RyhtiClient:
         # only contains description, and only in one language.
         plan_matter["name"] = plan.name
 
-        period_of_initiation = self.get_lifecycle_dates(plan, self.pending_status_value)
+        dates_of_initiation = self.get_lifecycle_dates(
+            plan, self.pending_status_value, datetimes=False
+        )
         plan_matter["timeOfInitiation"] = (
-            period_of_initiation["begin"] if period_of_initiation else None
+            dates_of_initiation["begin"] if dates_of_initiation else None
         )
         # Hooray, unlike plan, the plan *matter* description allows multilanguage data!
         plan_matter["description"] = plan.description
         plan_matter["producerPlanIdentifier"] = plan.producers_plan_identifier
-        plan_matter["caseIdentifiers"] = [plan.matter_management_identifier]
-        plan_matter["recordNumbers"] = [plan.record_number]
+        plan_matter["caseIdentifiers"] = (
+            [plan.matter_management_identifier]
+            if plan.matter_management_identifier
+            else []
+        )
+        plan_matter["recordNumbers"] = (
+            [plan.record_number] if plan.record_number else []
+        )
         # Apparently Ryhti plans may cover multiple administrative areas, so the region
         # identifier has to be embedded in a list.
         plan_matter["administrativeAreaIdentifiers"] = [
-            plan.organisation.administrative_region.value
+            plan.organisation.municipality.value
+            if plan.organisation.municipality
+            else plan.organisation.administrative_region.value
         ]
         # We have no need of importing the digital origin code list as long as we are
         # not digitizing old plans:
@@ -875,6 +1015,7 @@ class RyhtiClient:
             "digitalOrigin"
         ] = "http://uri.suomi.fi/codelist/rytj/RY_DigitaalinenAlkupera/code/01"
         # TODO: kaava-asian liitteet
+        # are these different from plan annexes? why? how??
         # plan_matter["matterAnnexes"] = self.get_plan_matter_annexes(plan)
         # TODO: lähdeaineistot
         # plan_matter["sourceDatas"] = self.get_source_datas(plan)
@@ -903,11 +1044,14 @@ class RyhtiClient:
             # Some plan fields may only be present in plan matter, not in the plan
             # dictionary. In the context of plan validation, they must be provided as
             # query parameters.
-            plan_type_parameter = self.plans[plan_id].plan_type.value
+            plan = self.plans[plan_id]
+            plan_type_parameter = plan.plan_type.value
             # We only support one area id, no need for commas and concat:
-            admin_area_id_parameter = self.plans[
-                plan_id
-            ].organisation.administrative_region.value
+            admin_area_id_parameter = (
+                plan.organisation.municipality.value
+                if plan.organisation.municipality
+                else plan.organisation.administrative_region.value
+            )
             if self.debug_json:
                 with open(f"ryhti_debug/{plan_id}.json", "w") as plan_file:
                     json.dump(plan_dict, plan_file)
@@ -946,6 +1090,91 @@ class RyhtiClient:
             LOGGER.info(responses[plan_id])
         return responses
 
+    def upload_plan_documents(self) -> Dict[str, List[RyhtiResponse]]:
+        """
+        Upload any changed plan documents. If document has not been modified
+        since it was last uploaded, do nothing.
+        """
+        responses: Dict[str, List[RyhtiResponse]] = dict()
+        file_endpoint = self.xroad_server_address + self.xroad_api_path + "File"
+        upload_headers = self.xroad_headers.copy()
+        upload_headers["Content-Type"] = "multipart/form-data"
+        for plan in self.valid_plans.values():
+            responses[plan.id] = []
+            municipality = (
+                plan.organisation.municipality.value
+                if plan.organisation.municipality
+                else None
+            )
+            region = plan.organisation.administrative_region.value
+            for document in plan.documents:
+                if document.url:
+                    # No need to upload if document hasn't changed
+                    if (
+                        document.exported_at
+                        and document.exported_at
+                        > email.utils.parsedate_to_datetime(
+                            requests.head(document.url).headers["Last-Modified"]
+                        )
+                    ):
+                        LOGGER.info("File unchanged since last upload.")
+                        responses[plan.id].append(
+                            RyhtiResponse(
+                                status=None,
+                                detail="File unchanged since last upload.",
+                                errors=None,
+                                warnings=None,
+                            )
+                        )
+                        continue
+                    # Let's try streaming the file instead of downloading
+                    # and then uploading:
+                    file_request = requests.get(document.url, stream=True)
+                    if file_request.status_code == 200:
+                        file_name = document.url.split("/")[-1]
+                        file_type = file_request.headers["Content-Type"]
+                        files = {
+                            "file": (
+                                file_name,
+                                file_request.raw,
+                                file_type,
+                            )
+                        }
+                        # TODO: get coordinate system from file. Maybe not easy
+                        # if just streaming it thru.
+                        post_parameters = (
+                            {"municipalityId": municipality}
+                            if municipality
+                            else {"regionId": region}
+                        )
+                        post_response = requests.post(
+                            file_endpoint,
+                            files=files,
+                            params=post_parameters,
+                            headers=upload_headers,
+                        )
+                        post_response.raise_for_status()
+                        LOGGER.info(f"Posted file {post_response.json()}")
+                        responses[plan.id].append(
+                            RyhtiResponse(
+                                status=201,
+                                detail=post_response.json(),
+                                errors=None,
+                                warnings=None,
+                            )
+                        )
+                    else:
+                        LOGGER.warning("Could not fetch file! Please check file URL.")
+                        responses[plan.id].append(
+                            RyhtiResponse(
+                                status=None,
+                                detail="Could not fetch file! Please check file URL.",
+                                errors=None,
+                                warnings=None,
+                            )
+                        )
+        return responses
+
     def get_permanent_plan_identifiers(self) -> Dict[str, RyhtiResponse]:
         """
         Get permanent plan identifiers for all plans that are marked
@@ -961,8 +1190,13 @@ class RyhtiClient:
                     + "permanentPlanIdentifier"
                 )
                 LOGGER.info(f"Getting permanent identifier for plan {plan.id}...")
+                administrative_area_identifier = (
+                    plan.organisation.municipality.value
+                    if plan.organisation.municipality
+                    else plan.organisation.administrative_region.value
+                )
                 data = {
-                    "administrativeAreaIdentifier": plan.organisation.administrative_region.value,  # noqa
+                    "administrativeAreaIdentifier": administrative_area_identifier,
                     "projectName": plan.producers_plan_identifier,
                 }
                 LOGGER.info("Request headers")
@@ -979,7 +1213,9 @@ class RyhtiClient:
                 LOGGER.info(response.headers)
                 LOGGER.info(response.text)
                 if response.status_code == 401:
-                    LOGGER.info("No permission to get plan identifier in this region!")
+                    LOGGER.info(
+                        "No permission to get plan identifier in this region or municipality!"  # noqa
+                    )
                     responses[plan.id] = {
                         "status": 401,
                         "errors": response.json(),
@@ -1286,7 +1522,7 @@ class RyhtiClient:
 
                 LOGGER.info(details[plan_id])
                 LOGGER.info(f"Ryhti response: {json.dumps(response)}")
-                plan.validated_at = datetime.datetime.now()
+                plan.validated_at = datetime.datetime.now(tz=LOCAL_TZ)
             session.commit()
         return Response(
             statusCode=200,
@@ -1296,6 +1532,29 @@ class RyhtiClient:
                 ryhti_responses=responses,
             ),
         )
+
+    def set_plan_documents(self, responses: Dict[str, List[RyhtiResponse]]):
+        """
+        Save uploaded plan document keys and export times to the database. Also,
+        append document data to the plan dictionaries.
+        """
+        with self.Session(expire_on_commit=False) as session:
+            for plan_id, response in responses.items():
+                # Make sure that the plan in the valid plans dict stays up to date
+                plan = self.valid_plans[plan_id]
+                session.add(plan)
+                for document, document_response in zip(
+                    plan.documents, response, strict=True
+                ):
+                    session.add(document)
+                    if document_response["status"] == 201:
+                        document.exported_file_key = document_response["detail"]
+                        document.exported_at = datetime.datetime.now(tz=LOCAL_TZ)
+                    # We can only serialize the document after it has been uploaded
+                    self.add_document_to_plan_dict(
+                        document, self.plan_dictionaries[plan_id]
+                    )
+                session.commit()
 
     def set_permanent_plan_identifiers(self, responses: Dict[str, RyhtiResponse]):
         """
@@ -1375,7 +1634,7 @@ class RyhtiClient:
 
                 LOGGER.info(details[plan_id])
                 LOGGER.info(f"Ryhti response: {json.dumps(response)}")
-                plan.validated_at = datetime.datetime.now()
+                plan.validated_at = datetime.datetime.now(tz=LOCAL_TZ)
             session.commit()
         return Response(
             statusCode=200,
@@ -1425,7 +1684,7 @@ class RyhtiClient:
                         plan_id
                     ] = f"Plan matter phase PUT successful for {plan_id}!"
                     plan.validation_errors = "Kaava-asian vaihe on päivitetty Ryhtiin."
-                    plan.exported_at = datetime.datetime.now()
+                    plan.exported_at = datetime.datetime.now(tz=LOCAL_TZ)
                     plan.to_be_exported = False
                 elif response["status"] == 201:
                     details[plan_id] = (
@@ -1434,7 +1693,7 @@ class RyhtiClient:
                         + "!"
                     )
                     plan.validation_errors = "Uusi kaava-asian vaihe on viety Ryhtiin."
-                    plan.exported_at = datetime.datetime.now()
+                    plan.exported_at = datetime.datetime.now(tz=LOCAL_TZ)
                     plan.to_be_exported = False
                 else:
                     details[plan_id] = f"Plan matter POST FAILED for {plan_id}."
@@ -1600,8 +1859,21 @@ def handler(
             LOGGER.info("Authenticating to X-road Ryhti API...")
             client.xroad_ryhti_authenticate()
 
+            # Documents are exported separately from plan matter. Also, they need to be
+            # present in Ryhti *before* plan matter is created.
+            #
+            # Therefore, let's export all the documents right away, and update them to
+            # the latest version when needed. Otherwise, the plan matter would never be
+            # valid. Only upload documents for those plans that are valid.
+            # 4) If changed documents exist, upload documents
+            LOGGER.info("Checking and updating plan documents for valid plans...")
+            plan_documents = client.upload_plan_documents()
+
+            LOGGER.info("Marking documents exported...")
+            client.set_plan_documents(plan_documents)
+
             # Only get identifiers for those plans that are valid.
-            # 4) Check or create permanent plan identifier for valid plans, from X-Road
+            # 5) Check or create permanent plan identifier for valid plans, from X-Road
             # API
             LOGGER.info("Getting permanent plan identifiers for valid plans...")
             plan_identifiers = client.get_permanent_plan_identifiers()
@@ -1609,14 +1881,14 @@ def handler(
             LOGGER.info("Setting permanent plan identifiers for valid plans...")
             client.set_permanent_plan_identifiers(plan_identifiers)
 
-            # 5) Validate plan matters with identifiers with X-Road API
+            # 6) Validate plan matters with identifiers with X-Road API
             LOGGER.info("Formatting plan matter data for valid plans...")
             client.plan_matter_dictionaries = client.get_plan_matters()
 
             LOGGER.info("Validating plan matters for valid plans...")
             responses = client.validate_plan_matters()
 
-            # 6) Save plan matter validation data
+            # 7) Save plan matter validation data
             LOGGER.info("Saving plan matter validation data for valid plans...")
             # Merge details and ryhti_responses for valid and invalid plans. Invalid
             # plans will have plan validation responses, valid plans will have plan
@@ -1634,11 +1906,11 @@ def handler(
                 "ryhti_responses"
             ] |= plan_matter_validation_response["body"]["ryhti_responses"]
             if event_type is Action.POST_PLANS:
-                # 7) Update Ryhti plan matters
+                # 8) Update Ryhti plan matters
                 LOGGER.info("POSTing marked and valid plan matters:")
                 responses = client.post_plan_matters()
 
-                # 8) Save plan matter update responses
+                # 9) Save plan matter update responses
                 LOGGER.info("Saving plan matter POST data for posted plans...")
                 # Merge details and ryhti_responses for valid and invalid plan matters.
                 # Invalid plans will have plan validation responses, invalid plan
@@ -1656,8 +1928,6 @@ def handler(
                 lambda_response["body"]["ryhti_responses"] |= plan_matter_post_response[
                     "body"
                 ]["ryhti_responses"]
-
-                # 9) TODO: If documents exist, upload documents
         else:
             LOGGER.info(
                 "Local XROAD_SERVER_ADDRESS, your organization XROAD_MEMBER_CODE, your "
