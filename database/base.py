@@ -44,9 +44,7 @@ uuid_pk = Annotated[
     uuid.UUID, mapped_column(primary_key=True, server_default=func.gen_random_uuid())
 ]
 unique_str = Annotated[str, mapped_column(unique=True, index=True)]
-language_str = Annotated[
-    dict[str, str], mapped_column(server_default='{"fin": "", "swe": "", "eng": ""}')
-]
+language_str = Annotated[dict[str, str], mapped_column(nullable=True)]
 numeric_range = Annotated[Range[float], mapped_column(nullable=True)]
 timestamp = Annotated[datetime, mapped_column(server_default=func.now())]
 
