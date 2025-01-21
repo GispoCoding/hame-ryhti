@@ -118,14 +118,20 @@ class MMLLoader:
         }
 
         with self.Session() as session:
-            admin_regions = session.query(AdministrativeRegion).all()
-            region_codes = sorted(
-                [admin_region.value for admin_region in admin_regions]
-            )
-            municipalities = session.query(Municipality).all()
-            municipality_codes = sorted(
-                [municipality.value for municipality in municipalities]
-            )
+            region_codes = [
+                value[0]
+                for value in (
+                    session.query(AdministrativeRegion.value)
+                    .order_by(AdministrativeRegion.value)
+                    .all()
+                )
+            ]
+            municipality_codes = [
+                value[0]
+                for value in (
+                    session.query(Municipality.value).order_by(Municipality.value).all()
+                )
+            ]
 
         polygons = {}
 
@@ -177,24 +183,20 @@ class MMLLoader:
                 LOGGER.info(
                     f"Adding geometry to administrative region {admin_region.value}..."
                 )
-                for admin_region_id, geom in geoms.items():
-                    if admin_region_id == admin_region.value:
-                        admin_region.geom = geom
-                        LOGGER.info(
-                            f"Geometry added to administrative region {admin_region.value}"  # noqa
-                        )
-                        successful_actions += 1
-                        break
+                if geom := geoms.get(admin_region.value):
+                    admin_region.geom = geom
+                    LOGGER.info(
+                        f"Geometry added to administrative region {admin_region.value}"  # noqa
+                    )
+                    successful_actions += 1
             for municipality in municipalities:
                 LOGGER.info(f"Adding geometry to municipality {municipality.value}...")
-                for municipality_id, geom in geoms.items():
-                    if municipality_id == municipality.value:
-                        municipality.geom = geom
-                        LOGGER.info(
-                            f"Geometry added to municipality {municipality.value}"  # noqa
-                        )
-                        successful_actions += 1
-                        break
+                if geom := geoms.get(municipality.value):
+                    municipality.geom = geom
+                    LOGGER.info(
+                        f"Geometry added to municipality {municipality.value}"  # noqa
+                    )
+                    successful_actions += 1
             session.commit()
         msg = f"{successful_actions} inserted or updated. 0 deleted."
         LOGGER.info(msg)
