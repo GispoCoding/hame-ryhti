@@ -465,7 +465,8 @@ class PlanRegulation(PlanBase):
     )
 
     text_value: Mapped[language_str]
-    numeric_value: Mapped[Optional[float]]
+    numeric_value: Mapped[Optional[int]]
+    decimal_value: Mapped[Optional[float]]
     numeric_range_min: Mapped[Optional[int]]
     numeric_range_max: Mapped[Optional[int]]
     unit: Mapped[Optional[str]]

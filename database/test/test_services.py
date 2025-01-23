@@ -408,6 +408,7 @@ def valid_plan_in_preparation(
     text_plan_regulation_instance: models.PlanRegulation,
     point_text_plan_regulation_instance: models.PlanRegulation,
     numeric_plan_regulation_instance: models.PlanRegulation,
+    decimal_plan_regulation_instance: models.PlanRegulation,
     numeric_range_plan_regulation_instance: models.PlanRegulation,
     verbal_plan_regulation_instance: models.PlanRegulation,
     general_plan_regulation_instance: models.PlanRegulation,
@@ -421,13 +422,7 @@ def valid_plan_in_preparation(
     """
     session.add(point_text_plan_regulation_instance)
     session.add(numeric_plan_regulation_instance)
-    session.add(numeric_range_plan_regulation_instance)
-    session.add(verbal_plan_regulation_instance)
-    session.add(general_plan_regulation_instance)
 
-    # General and verbal regulation type may *not* be intended use regulation!
-    verbal_plan_regulation_instance.intended_use = None
-    general_plan_regulation_instance.intended_use = None
     # Also, points cannot have intended use at the moment, though they should
     # be able to, they have detached houses type after all.
     point_text_plan_regulation_instance.intended_use = None

@@ -592,9 +592,17 @@ class RyhtiClient:
             }
         elif plan_regulation.numeric_value:
             regulation_dict["value"] = {
-                "dataType": "decimal",
-                # we have to use simplejson because numbers are Decimal
+                "dataType": "numeric",
                 "number": plan_regulation.numeric_value,
+                "unitOfMeasure": plan_regulation.unit,
+            }
+        elif plan_regulation.decimal_value:
+            regulation_dict["value"] = {
+                "dataType": "positiveDecimal"
+                if plan_regulation.decimal_value >= 0
+                else "decimal",
+                # we have to use simplejson because numbers are Decimal
+                "number": plan_regulation.decimal_value,
                 "unitOfMeasure": plan_regulation.unit,
             }
         elif plan_regulation.numeric_range_min or plan_regulation.numeric_range_max:
