@@ -418,6 +418,7 @@ def test_get_plan_dictionaries(
         result_plan_dict,
         desired_plan_dict,
         ignore_order_for_keys=[
+            "planRegulationGroups",
             "planRegulationGroupRelations",
             "additionalInformations",
         ],
@@ -824,6 +825,7 @@ def test_get_plan_matters(
             "fileKey",
         ],
         ignore_order_for_keys=[
+            "planRegulationGroups",
             "planRegulationGroupRelations",
             "additionalInformations",
         ],
