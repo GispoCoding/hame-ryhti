@@ -219,4 +219,5 @@ Add the necessary parameters as follows. You can also test the connection at thi
 
 ![screenshot of the new connection dialog](docs/img/qgis-create-connection.png)
 
-7. Install the [ARHO QGIS plugin](https://github.com/GispoCoding/arho-feature-template).
+7. Open the [ARHO QGIS project](https://github.com/GispoCoding/arho-feature-template/blob/main/qgisprojekti.qgz) in QGIS. It opens up the plan map layers contained in the ARHO database. If you wish, you may save the latest QGIS project version in your ARHO database, so you may edit it if needed and everybody may find the project in the database: Project > Save as... > PostgreSQL...
+8. Install the [ARHO QGIS plugin](https://github.com/GispoCoding/arho-feature-template).
