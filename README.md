@@ -193,11 +193,11 @@ NOTE: the Postgres service file for the dev environment is also included in in t
 
 ![screenshot of new profile menu](docs/img/qgis-new-profile.png)
 
-3. In QGIS settings add a `PGSERVICEFILE` environment variable and fill the file path of corresponding service file as a value.
+3. In QGIS settings add two environment variables. Add a `PGSERVICEFILE` variable and fill the file path of corresponding service file as a value. Add a second variable `PGTZ` and set the value to your local timezone using the time zone name from [tz database](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones), probably `Europe/Helsinki`. Choose `Overwrite` for both variables in the first column of the variable list.
 
 ![screenshot of menu location](docs/img/qgis-settings.png)
 
-![screenshot of the setting dialog](docs/img/qgis-pgservicefile-environment-variable.png)
+![screenshot of the setting dialog](docs/img/qgis-environment-variables.png)
 
 4. Restart QGIS to make the environment variable to take effect.
 
