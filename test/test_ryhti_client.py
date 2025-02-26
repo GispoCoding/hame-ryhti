@@ -4,13 +4,13 @@ import re
 from typing import Callable
 from uuid import uuid4
 
-import codes
-import models
 import pytest
 from requests_mock.request import _RequestObjectProxy
-from ryhti_client.ryhti_client import RyhtiClient
 from simplejson import JSONEncoder
 from sqlalchemy.orm import Session
+
+from database import codes, models
+from lambdas.ryhti_client.ryhti_client import RyhtiClient
 
 from .conftest import deepcompare
 
